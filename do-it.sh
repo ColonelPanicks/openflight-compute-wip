@@ -43,7 +43,7 @@ fi
 cd /tmp/flight-architect
 git checkout feature/plugins
 git pull
-rsync -auv /tmp/flight-architect/data/ /opt/flight/opt/architect/data/
+rsync -auv /tmp/flight-architect/data/example/ /opt/flight/opt/architect/data/example/
 
 ######################
 # Create New Cluster #
