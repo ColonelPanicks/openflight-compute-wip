@@ -15,20 +15,15 @@
 #################
 
 CLUSTERNAME="$1"
-ROOTPASS="$2"
-SSH_PUB_KEY="$3"
+SSH_PUB_KEY="$2"
 
 if [ -z "${CLUSTERNAME}" ] ; then
     echo "Provide cluster name"
-    echo "  do-it.sh CLUSTERNAME ROOTPASS SSH_PUB_KEY"
-    exit 1
-elif [ -z "${ROOTPASS}" ] ; then
-    echo "Provide root password"
-    echo "  do-it.sh CLUSTERNAME ROOTPASS SSH_PUB_KEY"
+    echo "  do-it.sh CLUSTERNAME SSH_PUB_KEY"
     exit 1
 elif [ -z "${SSH_PUB_KEY}" ] ; then
     echo "Provide ssh public key"
-    echo "  do-it.sh CLUSTERNAME ROOTPASS SSH_PUB_KEY"
+    echo "  do-it.sh CLUSTERNAME SSH_PUB_KEY"
     exit 1
 fi
 
@@ -58,7 +53,8 @@ kill -9 $PID 2> /dev/null
 set -m # Enable background job creation message
 
 # Configure domain
-flight architect configure domain -a "{ \"cluster_name\": \"$CLUSTERNAME\", \"root_password\": \"$(openssl passwd -1 $ROOTPASS)\", \"root_ssh_key\": \"$SSH_PUB_KEY\", \"network2_defined\": false, \"network3_defined\": false }"
+flight architect configure domain -a "{ \"cluster_name\": \"$CLUSTERNAME\", \"root_password\": \"$(openssl rand -base64 16)\", \"root_ssh_key\": \"empty-key-no-root-ssh\", \"network2_defined\": false, \"network3_defined\": false }"
+echo "user_ssh_pub_key: $USER_SSH_PUB_KEY" >> /var/lib/underware/clusters/$CLUSTERNAME/etc/configs/nodes/gateway1.yaml
 
 # Generate Templates
 flight architect template
