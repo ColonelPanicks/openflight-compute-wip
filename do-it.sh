@@ -4,6 +4,8 @@
 # Run this script on a hub
 #
 
+# TODO: Create a super-tiny minimal hub that can do this so there isn't potential of clashing when launching multiple clusters at once
+## Private image that contains pre-configured AWS access keys?
 # TODO: Ensure enough disk space on gateway to support running jobs, etc
 # TODO: Ensure a genders file exists
 # TODO: Setup user with password & SSH key
@@ -16,15 +18,15 @@ CLUSTERNAME="$1"
 ROOTPASS="$2"
 SSH_PUB_KEY="$3"
 
-if [ -z "${CLUSTERNAME}" ] ; do
+if [ -z "${CLUSTERNAME}" ] ; then
     echo "Provide cluster name"
     echo "  do-it.sh CLUSTERNAME ROOTPASS SSH_PUB_KEY"
     exit 1
-elif [ -z "${ROOTPASS}" ] ; do 
+elif [ -z "${ROOTPASS}" ] ; then
     echo "Provide root password"
     echo "  do-it.sh CLUSTERNAME ROOTPASS SSH_PUB_KEY"
     exit 1
-elif [ -z "${SSH_PUB_KEY}" ] ; do 
+elif [ -z "${SSH_PUB_KEY}" ] ; then
     echo "Provide ssh public key"
     echo "  do-it.sh CLUSTERNAME ROOTPASS SSH_PUB_KEY"
     exit 1
