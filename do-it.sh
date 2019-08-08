@@ -66,14 +66,14 @@ cp /var/lib/underware/clusters/$CLUSTERNAME/var/rendered/kickstart/domain/platfo
 
 # Import to cloud
 flight cloud cluster init $CLUSTERNAME aws
-flight cloud import /var/lib/underware/clusters/$CLUSTER/var/rendered/manifest.yaml > /dev/null
+flight cloud import /var/lib/underware/clusters/$CLUSTERNAME/var/rendered/manifest.yaml > /dev/null
 
 ####################
 # Deploy Resources #
 ####################
 
 # Deploy domain/gateway
-flight cloud deploy domain && flight cloud deploy gateway1
+flight cloud deploy domain && flight cloud deploy gateway1 -p 'securitygroup,network1SubnetID=*domain'
 
 # Deploy nodes
 
