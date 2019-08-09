@@ -8,7 +8,6 @@
 ## Private image that contains pre-configured AWS access keys?
 # TODO: Ensure enough disk space on gateway to support running jobs, etc
 # TODO: Ensure a genders file exists
-# TODO: Setup user with password & SSH key
 
 #################
 # Checking Args #
@@ -39,6 +38,19 @@ cd /tmp/flight-architect
 git checkout feature/plugins
 git pull
 rsync -auv /tmp/flight-architect/data/example/ /opt/flight/opt/architect/data/example/
+
+################
+# Set Build IP #
+################
+
+IP="$(curl -f http://169.254.169.254/latest/meta-data/public-ipv4 2> /dev/null)"
+if [ $? != 0 ] ; then
+    ## Azure IP
+    IP="$(curl -f -H Metadata:true 'http://169.254.169.254/metadata/instance/network/interface/0/ipv4
+/ipAddress/0/publicIpAddress?api-version=2019-06-01&format=text')"
+fi
+sed -i "s,renderedurl:.*,renderedurl: http://$IP/architect/<%=node.config.cluster%>/var/rendered/<%=n
+ode.platform%>/node/<%=node.name%>,g" /opt/flight/opt/architect/data/base/etc/configs/domain.yaml
 
 ######################
 # Create New Cluster #
@@ -71,5 +83,8 @@ flight cloud import /var/lib/underware/clusters/$CLUSTERNAME/var/rendered/manife
 # Deploy domain/gateway
 flight cloud deploy domain && flight cloud deploy gateway1 -p 'securitygroup,network1SubnetID=*domain'
 
-# Deploy nodes
+# Allow enought time for Direct to be setup on gateway
+sleep 180
 
+# Deploy nodes
+flight cloud deploy -g nodes -p 'securitygroup,network1SubnetID=*domain'
