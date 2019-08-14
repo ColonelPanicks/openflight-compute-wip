@@ -82,7 +82,7 @@ flight cloud import /var/lib/underware/clusters/$CLUSTERNAME/var/rendered/manife
 flight cloud deploy domain && flight cloud deploy gateway1 -p 'securitygroup,network1SubnetID=*domain'
 
 # Allow enought time for Direct to be setup on gateway
-sleep 180
+sleep 240
 
 # Deploy nodes
 flight cloud deploy -g nodes -p 'securitygroup,network1SubnetID=*domain'
