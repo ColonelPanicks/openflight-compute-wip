@@ -40,7 +40,7 @@ flight cloud import /var/lib/architect/clusters/$TYPE/var/rendered/manifest.yaml
 flight cloud deploy domain && flight cloud deploy gateway1 -p "securitygroup,network1SubnetID=*domain nametext=$CLUSTERNAME user_ssh_pub_key='$SSH_PUB_KEY'"
 
 # Allow enought time for Direct to be setup on gateway
-sleep 300
+sleep 180
 
 # Deploy nodes
 flight cloud deploy node01 -p "securitygroup,network1SubnetID=*domain nametext=$CLUSTERNAME user_ssh_pub_key='$SSH_PUB_KEY'"
