@@ -13,7 +13,7 @@
 
 CLUSTERNAME="$1"
 SSH_PUB_KEY="$2"
-TYPE="gateway2nodes"
+TYPE="basic"
 PLATFORM="azure"
 
 if [ -z "${CLUSTERNAME}" ] ; then
