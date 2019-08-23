@@ -32,17 +32,20 @@ rsync -auv /tmp/flight-architect/data/example/ /opt/flight/opt/architect/data/ex
 # Create basic cluster #
 ########################
 
+# Gateway 2 Nodes
+BASICCLUSTERNAME="basic"
+
 # Initialise cluster
 set +m # Silence background job creation message
-{ flight architect cluster init gateway2nodes > /dev/null & } 2>/dev/null
+{ flight architect cluster init $BASICCLUSTERNAME > /dev/null & } 2>/dev/null
 PID=$!
 sleep 5
 kill -9 $PID 2> /dev/null
 set -m # Enable background job creation message
 
 # Configure domain
-flight architect configure domain -a "{ \"cluster_name\": \"gateway2nodes\", \"root_password\": \"$(openssl rand -base64 16)\", \"root_ssh_key\": \"empty-key-no-root-ssh\", \"network2_defined\": false, \"network3_defined\": false }"
+flight architect configure domain -a "{ \"cluster_name\": \"$BASICCLUSTERNAME\", \"root_password\": \"$(openssl rand -base64 16)\", \"root_ssh_key\": \"empty-key-no-root-ssh\", \"network2_defined\": false, \"network3_defined\": false }"
 
 flight architect template
-cp /var/lib/architect/clusters/gateway2nodes/var/rendered/kickstart/domain/platform/manifest.yaml /var/lib/architect/clusters/gateway2nodes/var/rendered/
+cp /var/lib/architect/clusters/$BASICCLUSTERNAME/var/rendered/kickstart/domain/platform/manifest.yaml /var/lib/architect/clusters/$BASICCLUSTERNAME/var/rendered/
 
