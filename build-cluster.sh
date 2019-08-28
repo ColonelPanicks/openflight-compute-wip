@@ -5,7 +5,6 @@
 #
 
 # TODO: Ensure enough disk space on gateway to support running jobs, etc
-# TODO: Ensure a genders file exists
 
 #################
 # Checking Args #
