@@ -185,7 +185,7 @@
         "settings": {
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('curl http://', parameters('controllerip'), '/deployment/setup.sh')]"
+          "commandToExecute": "[concat('curl http://', parameters('controllerip'), '/deployment/setup.sh |/bin/bash')]"
         }
       }
    },
