@@ -19,7 +19,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 LOG="$DIR/log/deploy.log"
 
 SEED=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 6 ; echo '')
-CLUSTERNAME="$CLUSTERNAMEARG-$EED"
+CLUSTERNAME="$CLUSTERNAMEARG-$SEED"
 
 # The host IP which is sharing setup.sh script at IP/deployment/setup.sh
 ## Likely to be this machine
@@ -45,28 +45,11 @@ fi
 
 echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | $SSH_PUB_KEY" |tee -a $LOG
 
-#################
-# Run Functions #
-#################
-
-case $PLATFORM in
-    "azure")
-        LOCATION="UK South"
-        SOURCE_IMAGE="/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/alcesflight/providers/Microsoft.Compute/images/CENTOS7BASE2808191247"
-        deploy_azure
-    ;;
-    "aws")
-        LOCATION="eu-west-1"
-        SOURCE_IMAGE=""
-        deploy_aws
-    ;;
-esac
-
 #############
 # Functions #
 #############
 
-deploy_azure() {
+function deploy_azure() {
     az group create --name $CLUSTERNAME --location $LOCATION
     az group deployment create --name $CLUSTERNAME --resource-group $CLUSTERNAME \
         --template-file $DIR/templates/azure/cluster.json \
@@ -94,5 +77,23 @@ EOF
     ansible-playbook -i /opt/flight/$CLUSTERNAME openflight.yml
 
 }
+
+#################
+# Run Functions #
+#################
+
+case $PLATFORM in
+    "azure")
+        LOCATION="UK South"
+        SOURCE_IMAGE="/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/alcesflight/providers/Microsoft.Compute/images/CENTOS7BASE2808191247"
+        deploy_azure
+    ;;
+    "aws")
+        LOCATION="eu-west-1"
+        SOURCE_IMAGE=""
+        deploy_aws
+    ;;
+esac
+
 
 echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | End Deploy | Gateway1 IP: $(az network public-ip show -g $CLUSTERNAME -n flightcloudclustergateway1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')" |tee -a $LOG
