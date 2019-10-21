@@ -175,7 +175,7 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2015-06-15",
       "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachines/', 'gateway1')]"
+        "[resourceId('Microsoft.Compute/virtualMachines/', 'flightcloudclustergateway1')]"
       ],
       "properties": {
         "publisher": "Microsoft.Azure.Extensions",
