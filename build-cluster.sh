@@ -60,7 +60,8 @@ function deploy_azure() {
         computeNodesCount="$COMPUTENODES"
 
     # Create ansible hosts file
-    cat << EOF > /opt/flight/$CLUSTERNAME
+    mkdir -p /opt/flight/clusters
+    cat << EOF > /opt/flight/clusters/$CLUSTERNAME
 [gateway]
 gateway1    ansible_host=$(az network public-ip show -g $CLUSTERNAME -n flightcloudclustergateway1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
 
@@ -74,7 +75,7 @@ EOF
     # Run ansible playbook
     cd /root/openflight-ansible-playbook
     export ANSIBLE_HOST_KEY_CHECKING=false
-    ansible-playbook -i /opt/flight/$CLUSTERNAME openflight.yml
+    ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME openflight.yml
 
 }
 
