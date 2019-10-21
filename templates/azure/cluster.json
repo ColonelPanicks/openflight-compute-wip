@@ -14,6 +14,12 @@
               "description": "Source image to use for nodes"
           }
       },
+      "clustername": {
+          "type": "string",
+          "metadata": {
+              "description": "Name of the cluster"
+          }
+      },
       "computeNodesCount": {
           "type": "int",
           "defaultValue": 2,
@@ -23,6 +29,9 @@
               "description": "Number of compute nodes to include in cluster"
           }
       }
+  },
+  "variables": {
+      "subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightcloudclusternetwork', 'flightcloudclusternetwork1')]"
   },
   "resources": [
     {
@@ -76,7 +85,7 @@
         "publicIPAllocationMethod": "Static",
         "idleTimeoutInMinutes": 30,
         "dnsSettings": {
-          "domainNameLabel": "gateway1"
+          "domainNameLabel": "[concat('gateway1-', parameters('clustername'))]"
         }
       }
     },
@@ -94,7 +103,7 @@
               "id": "[resourceId('Microsoft.Network/publicIpAddresses', 'flightcloudclustergateway1pubIP')]"
             },
             "subnet": {
-              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightcloudclusternetwork', 'flightcloudclusternetwork1')]"
+              "id": "[variables('subnet1Ref')]"
             }
           }
         }],
@@ -127,7 +136,7 @@
           }
         },
             "osProfile": {
-          "computerName": "gateway1.pri.mycluster.cluster.local",
+          "computerName": "[concat('gateway1.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
@@ -156,7 +165,7 @@
     },
     {
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat('flightcloudclusternode0', copyindex(), 'pubIP')]",
+      "name": "[concat('flightcloudclusternode0', copyindex(1), 'pubIP')]",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
       "copy": {
@@ -167,13 +176,13 @@
         "publicIPAllocationMethod": "Static",
         "idleTimeoutInMinutes": 30,
         "dnsSettings": {
-          "domainNameLabel": "[concat('node0', copyindex())]"
+          "domainNameLabel": "[concat('node0', copyindex(1), '-', parameters('clustername'))]"
         }
       }
     },
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat('flightcloudclusternode0', copyindex(), 'network1interface')]",
+      "name": "[concat('flightcloudclusternode0', copyindex(1), 'network1interface')]",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
       "copy": {
@@ -182,14 +191,14 @@
       },
       "properties": {
         "ipConfigurations": [{
-          "name": "[concat('flightcloudclusternode0', copyindex(), 'network1ip')]",
+          "name": "[concat('flightcloudclusternode0', copyindex(1), 'network1ip')]",
           "properties": {
             "privateIPAllocationMethod": "Dynamic",
             "publicIPAddress": {
-              "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat('flightcloudclusternode0', copyindex(), 'pubIP'))]"
+              "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat('flightcloudclusternode0', copyindex(1), 'pubIP'))]"
             },
             "subnet": {
-              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightcloudclusternetwork', 'flightcloudclusternetwork1')]"
+              "id": "[variables('subnet1Ref')]"
             }
           }
         }],
@@ -203,7 +212,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat('flightcloudclusternode0', copyindex())]",
+      "name": "[concat('flightcloudclusternode0', copyindex(1))]",
       "apiVersion": "2016-04-30-preview",
       "location": "[resourceGroup().location]",
       "copy": {
@@ -226,7 +235,7 @@
           }
         },
           "osProfile": {
-          "computerName": "[concat('node0', copyindex(), '.pri.mycluster.cluster.local')]",
+          "computerName": "[concat('node0', copyindex(1), '.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
@@ -241,7 +250,7 @@
         "networkProfile": {
           "networkInterfaces": [
           {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('flightcloudclusternode0', copyindex(), 'network1interface'))]",
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('flightcloudclusternode0', copyindex(1), 'network1interface'))]",
                 "properties": {
                   "primary": true
                 }
