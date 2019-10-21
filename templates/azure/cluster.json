@@ -20,6 +20,12 @@
               "description": "Name of the cluster"
           }
       },
+      "controllerip": {
+          "type": "string",
+          "metadata": {
+              "description": "IP address of the cloud controller to obtain setup script from"
+          }
+      },
       "computeNodesCount": {
           "type": "int",
           "defaultValue": 2,
@@ -163,6 +169,26 @@
         "[resourceId('Microsoft.Network/networkInterfaces', 'flightcloudclustergateway1network1interface')]"
       ]
     },
+   {
+      "name": "gateway1/startupscript",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines/', 'gateway1')]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+        },
+        "protectedSettings": {
+          "commandToExecute": "[concat('curl http://', parameters('controllerip'), '/deployment/setup.sh')]"
+        }
+      }
+   },
     {
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[concat('flightcloudclusternode0', copyindex(1), 'pubIP')]",
