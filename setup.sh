@@ -13,39 +13,25 @@ if [ $? != 0 ] ; then
     ## Azure IP
     IP="$(curl -f -H Metadata:true 'http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/publicIpAddress?api-version=2019-06-01&format=text' 2>/dev/null)"
 fi
-sed -i "s,renderedurl:.*,renderedurl: http://$IP/architect/<%=node.config.cluster%>/var/rendered/<%=node.platform%>/node/<%=node.name%>,g" /opt/flight/opt/architect/data/base/etc/configs/domain.yaml
 
-######################################
-# Setup OpenFlight Compute Templates #
-######################################
 
-# Put into place
-if ! [ -d /tmp/flight-architect ] ; then
-    git clone https://github.com/openflighthpc/flight-architect /tmp/flight-architect
-fi
-cd /tmp/flight-architect
-git checkout dev/openflight-compute
-git pull
-rsync -auv /tmp/flight-architect/data/example/ /opt/flight/opt/architect/data/example/
+# Create SSH keypair
+ssh-keygen -N ''
 
-########################
-# Create basic cluster #
-########################
+# Create deployment script
+cat << EOF > /opt/flight/deployment/setup.sh
+#!/bin/bash
 
-# Gateway 2 Nodes
-BASICCLUSTERNAME="basic"
+# Variables
+CONTROLLER_SSH_PUB_KEY="$(cat /root/.ssh/id_rsa.pub)"
 
-# Initialise cluster
-set +m # Silence background job creation message
-{ flight architect cluster init $BASICCLUSTERNAME > /dev/null & } 2>/dev/null
-PID=$!
-sleep 5
-kill -9 $PID 2> /dev/null
-set -m # Enable background job creation message
+# Allow SSH from controller
+echo "\$CONTROLLER_SSH_PUB_KEY" >> /root/.ssh/authorized_keys
 
-# Configure domain
-flight architect configure domain -a "{ \"cluster_name\": \"$BASICCLUSTERNAME\", \"root_password\": \"$(openssl rand -base64 16)\", \"root_ssh_key\": \"empty-key-no-root-ssh\", \"network2_defined\": false, \"network3_defined\": false }"
+# Get rid of pesky firewalls
+firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd --add-interface eth0 --zone trusted --permanent && firewall-cmd --reload
+EOF
 
-flight architect template
-cp /var/lib/architect/clusters/$BASICCLUSTERNAME/var/rendered/kickstart/domain/platform/manifest.yaml /var/lib/architect/clusters/$BASICCLUSTERNAME/var/rendered/
-
+# Get ansible playbook
+cd
+git clone https://github.com/openflighthpc/openflight-ansible-playbook
