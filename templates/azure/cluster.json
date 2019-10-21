@@ -170,7 +170,7 @@
       ]
     },
    {
-      "name": "gateway1/startupscript",
+      "name": "flightcloudclustergateway1/startupscript",
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "location": "[resourceGroup().location]",
       "apiVersion": "2015-06-15",
