@@ -1,0 +1,260 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "sshPublicKey": {
+          "type": "string",
+          "metadata": {
+              "description": "SSH public key for flight user"
+          }
+      },
+      "sourceimage": {
+          "type": "string",
+          "metadata": {
+              "description": "Source image to use for nodes"
+          }
+      },
+      "computeNodesCount": {
+          "type": "int",
+          "defaultValue": 2,
+          "minValue": 2,
+          "maxValue": 8,
+          "metadata": {
+              "description": "Number of compute nodes to include in cluster"
+          }
+      }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "flightcloudclusternetwork",
+      "apiVersion": "2017-03-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.10.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "flightcloudclusternetwork1",
+            "properties": {
+              "addressPrefix": "10.10.0.0/19"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "flightcloudclustersecuritygroup",
+      "apiVersion": "2017-03-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "securityRules": [{
+           "name": "inbound-ssh",
+             "properties": {
+             "protocol": "TCP",
+             "sourcePortRange": "*",
+             "destinationPortRange": "22",
+             "sourceAddressPrefix": "*",
+             "destinationAddressPrefix": "*",
+             "access": "Allow",
+             "priority": 1000,
+             "direction": "Inbound"
+           }
+         }]
+       }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "flightcloudclustergateway1pubIP",
+      "apiVersion": "2017-03-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "idleTimeoutInMinutes": 30,
+        "dnsSettings": {
+          "domainNameLabel": "gateway1"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "flightcloudclustergateway1network1interface",
+      "apiVersion": "2017-03-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "ipConfigurations": [{
+          "name": "flightcloudclustergateway1network1ip",
+          "properties": {
+            "privateIPAllocationMethod": "Dynamic",
+            "publicIPAddress": {
+              "id": "[resourceId('Microsoft.Network/publicIpAddresses', 'flightcloudclustergateway1pubIP')]"
+            },
+            "subnet": {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightcloudclusternetwork', 'flightcloudclusternetwork1')]"
+            }
+          }
+        }],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIpAddresses', 'flightcloudclustergateway1pubIP')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "flightcloudclustergateway1",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "hardwareProfile": {
+              "vmSize": "Standard_DS1_v2"
+            },
+        "storageProfile": {
+          "osDisk": {
+            "createOption": "fromImage",
+            "managedDisk": {
+              "storageAccountType": "Premium_LRS"
+            }
+          },
+          "imageReference": {
+            "id": "[parameters('sourceimage')]"
+          }
+        },
+            "osProfile": {
+          "computerName": "gateway1.pri.mycluster.cluster.local",
+          "adminUsername": "flight",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+            "publicKeys": [{
+              "path": "[concat ('/home/flight', '/.ssh/authorized_keys')]",
+              "keyData": "[parameters('sshPublicKey')]"
+              }]
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+          {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'flightcloudclustergateway1network1interface')]",
+                "properties": {
+                  "primary": true
+                }
+          }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', 'flightcloudclustergateway1network1interface')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[concat('flightcloudclusternode0', copyindex(), 'pubIP')]",
+      "apiVersion": "2017-03-01",
+      "location": "[resourceGroup().location]",
+      "copy": {
+          "name": "pubLoop",
+          "count": "[parameters('computeNodesCount')]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "idleTimeoutInMinutes": 30,
+        "dnsSettings": {
+          "domainNameLabel": "[concat('node0', copyindex())]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat('flightcloudclusternode0', copyindex(), 'network1interface')]",
+      "apiVersion": "2017-03-01",
+      "location": "[resourceGroup().location]",
+      "copy": {
+          "name": "nicLoop",
+          "count": "[parameters('computeNodesCount')]"
+      },
+      "properties": {
+        "ipConfigurations": [{
+          "name": "[concat('flightcloudclusternode0', copyindex(), 'network1ip')]",
+          "properties": {
+            "privateIPAllocationMethod": "Dynamic",
+            "publicIPAddress": {
+              "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat('flightcloudclusternode0', copyindex(), 'pubIP'))]"
+            },
+            "subnet": {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightcloudclusternetwork', 'flightcloudclusternetwork1')]"
+            }
+          }
+        }],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
+        }
+      },
+      "dependsOn": [
+        "pubLoop"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat('flightcloudclusternode0', copyindex())]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[resourceGroup().location]",
+      "copy": {
+          "name": "computeLoop",
+          "count": "[parameters('computeNodesCount')]"
+      },
+      "properties": {
+        "hardwareProfile": {
+              "vmSize": "Standard_DS1_v2"
+            },
+        "storageProfile": {
+          "osDisk": {
+            "createOption": "fromImage",
+            "managedDisk": {
+              "storageAccountType": "Premium_LRS"
+            }
+          },
+          "imageReference": {
+            "id": "[parameters('sourceimage')]"
+          }
+        },
+          "osProfile": {
+          "computerName": "[concat('node0', copyindex(), '.pri.mycluster.cluster.local')]",
+          "adminUsername": "flight",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+            "publicKeys": [{
+              "path": "[concat ('/home/flight', '/.ssh/authorized_keys')]",
+              "keyData": "[parameters('sshPublicKey')]"
+              }]
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+          {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('flightcloudclusternode0', copyindex(), 'network1interface'))]",
+                "properties": {
+                  "primary": true
+                }
+          }
+          ]
+        }
+      },
+      "dependsOn": [
+        "nicLoop"
+      ]
+    }
+  ]
+}
+
+
+
