@@ -33,5 +33,6 @@ firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd -
 EOF
 
 # Get ansible playbook
+yum -y install ansible
 cd
 git clone https://github.com/openflighthpc/openflight-ansible-playbook
