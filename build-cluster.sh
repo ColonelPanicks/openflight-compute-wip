@@ -50,7 +50,7 @@ echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | $
 #############
 
 function deploy_azure() {
-    az group create --name $CLUSTERNAME --location $LOCATION
+    az group create --name $CLUSTERNAME --location "$LOCATION"
     az group deployment create --name $CLUSTERNAME --resource-group $CLUSTERNAME \
         --template-file $DIR/templates/azure/cluster.json \
         --parameters sshPublicKey="$SSH_PUB_KEY" \
