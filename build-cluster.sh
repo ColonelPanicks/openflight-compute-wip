@@ -18,7 +18,7 @@ COMPUTENODES="${COMPUTENODES:-2}"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 LOG="$DIR/log/deploy.log"
 
-SEED=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 6 ; echo '')
+SEED=$(head /dev/urandom | tr -dc a-z0-9 | head -c 6 ; echo '')
 CLUSTERNAME="$CLUSTERNAMEARG-$SEED"
 
 # The host IP which is sharing setup.sh script at IP/deployment/setup.sh
@@ -50,8 +50,8 @@ echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | $
 #############
 
 function deploy_azure() {
-    az group create --name $CLUSTERNAME --location "$LOCATION"
-    az group deployment create --name $CLUSTERNAME --resource-group $CLUSTERNAME \
+    az group create --name "$CLUSTERNAME" --location "$LOCATION"
+    az group deployment create --name "$CLUSTERNAME" --resource-group "$CLUSTERNAME" \
         --template-file $DIR/templates/azure/cluster.json \
         --parameters sshPublicKey="$SSH_PUB_KEY" \
         sourceimage="$SOURCE_IMAGE" \
