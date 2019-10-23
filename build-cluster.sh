@@ -1,10 +1,8 @@
 #!/bin/bash
 
 #
-# Run this script on a hub
+# Run this script on a cloud controller
 #
-
-# TODO: Ensure enough disk space on gateway to support running jobs, etc
 
 #############
 # Variables #
@@ -39,10 +37,17 @@ elif [ -z "${SSH_PUB_KEY}" ] ; then
     exit 1
 fi
 
+# Don't allow SSH_PUB_KEY to be set to the controller's pub key (as this is added via setup.sh on the deployed nodes)
+if [[ *"$(cat /root/.ssh/id_rsa.pub)"* == *"$SSH_PUB_KEY"* ]] ; then
+    echo "Provide ssh public key that is *not* this controller's public key."
+    echo "This controller's key is automatically added to the compute nodes at deployment"
+    echo "to allow ansible setup to run on nodes"
+    exit 1
+fi
+
 ###############
 # Log Details #
 ###############
-
 echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | $SSH_PUB_KEY" |tee -a $LOG
 
 #############
@@ -71,12 +76,21 @@ echo "node0$i    ansible_host=$(az network public-ip show -g $CLUSTERNAME -n fli
 i=$((i + 1))
 done)
 EOF
+    
+    # Customise nodes
+    run_ansible
+}
 
+function deploy_aws() {
+
+
+}
+
+function run_ansible() {
     # Run ansible playbook
     cd /root/openflight-ansible-playbook
     export ANSIBLE_HOST_KEY_CHECKING=false
     ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME openflight.yml
-
 }
 
 #################
