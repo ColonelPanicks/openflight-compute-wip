@@ -81,10 +81,10 @@ EOF
     run_ansible
 }
 
-function deploy_aws() {
-
-
-}
+#function deploy_aws() {
+#
+#
+#}
 
 function run_ansible() {
     # Run ansible playbook
