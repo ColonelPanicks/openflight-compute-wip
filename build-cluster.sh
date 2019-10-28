@@ -115,7 +115,7 @@ function run_ansible() {
     # Run ansible playbook
     cd /root/openflight-ansible-playbook
     export ANSIBLE_HOST_KEY_CHECKING=false
-    ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME openflight.yml
+    ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "cluster_name=$CLUSTERNAMEARG" openflight.yml
 }
 
 #################
