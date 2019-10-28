@@ -8,19 +8,21 @@
 # Variables #
 #############
 
+# Get directory of script for locating templates and config
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# Source variables
+source $DIR/config.sh
+
 CLUSTERNAMEARG="$1"
 SSH_PUB_KEY="$2"
-PLATFORM="${PLATFORM:-azure}"
-COMPUTENODES="${COMPUTENODES:-2}"
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 LOG="$DIR/log/deploy.log"
 
 SEED=$(head /dev/urandom | tr -dc a-z0-9 | head -c 6 ; echo '')
 CLUSTERNAME="$CLUSTERNAMEARG-$SEED"
 
-# The host IP which is sharing setup.sh script at IP/deployment/setup.sh
-## Likely to be this machine
+# The host IP which is sharing setup.sh script at http://IP/deployment/setup.sh
 CONTROLLERIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
 
 #################
@@ -34,6 +36,9 @@ if [ -z "${CLUSTERNAME}" ] ; then
 elif [ -z "${SSH_PUB_KEY}" ] ; then
     echo "Provide ssh public key"
     echo "  build-cluster.sh CLUSTERNAME SSH_PUB_KEY"
+    exit 1
+elif [ "$COMPUTENODES" -lt 2 -o "$COMPUTENODES" -gt 8 ] ; then
+    echo "Number of nodes must be between 2 and 8"
     exit 1
 fi
 
@@ -54,12 +59,32 @@ echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | $
 # Functions #
 #############
 
+function check_azure() {
+    # Azure variables are non-empty
+    if [ -z "${AZURE_SOURCEIMAGE}" ] ; then
+        echo "AZURE_SOURCEIMAGE is not set in config.sh"
+        echo "Set this before running script again"
+        exit 1
+    elif [ -z "${AZURE_LOCATION}" ] ; then
+        echo "AZURE_SOURCEIMAGE is not set in config.sh"
+        echo "Set this before running script again"
+        exit 1
+    fi
+
+    # Azure login configured
+    if ! az account show > /dev/null 2>&1 ; then
+        echo "Azure account not connected to CLI"
+        echo "Run az login to connect your account"
+        exit 1
+    fi
+}
+
 function deploy_azure() {
-    az group create --name "$CLUSTERNAME" --location "$LOCATION"
+    az group create --name "$CLUSTERNAME" --location "$AZURE_LOCATION"
     az group deployment create --name "$CLUSTERNAME" --resource-group "$CLUSTERNAME" \
         --template-file $DIR/templates/azure/cluster.json \
         --parameters sshPublicKey="$SSH_PUB_KEY" \
-        sourceimage="$SOURCE_IMAGE" \
+        sourceimage="$AZURE_SOURCEIMAGE" \
         controllerip="$CONTROLLERIP" \
         clustername="$CLUSTERNAME" \
         computeNodesCount="$COMPUTENODES"
@@ -99,13 +124,10 @@ function run_ansible() {
 
 case $PLATFORM in
     "azure")
-        LOCATION="UK South"
-        SOURCE_IMAGE="/subscriptions/d1e964ef-15c7-4b27-8113-e725167cee83/resourceGroups/alcesflight/providers/Microsoft.Compute/images/CENTOS7BASE2808191247"
+        check_azure
         deploy_azure
     ;;
     "aws")
-        LOCATION="eu-west-1"
-        SOURCE_IMAGE=""
         deploy_aws
     ;;
 esac
