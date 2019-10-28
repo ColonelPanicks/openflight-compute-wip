@@ -66,7 +66,7 @@ function check_azure() {
         echo "Set this before running script again"
         exit 1
     elif [ -z "${AZURE_LOCATION}" ] ; then
-        echo "AZURE_SOURCEIMAGE is not set in config.sh"
+        echo "AZURE_LOCATION is not set in config.sh"
         echo "Set this before running script again"
         exit 1
     fi
