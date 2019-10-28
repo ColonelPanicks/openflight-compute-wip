@@ -16,7 +16,7 @@ Currently, this is being developed and tested on Azure.
     git clone https://github.com/openflighthpc/openflight-compute-cluster-builder
     ```
 
-4. Run the setup
+4. Run the setup (*Note: this will create an SSH keypair at /root/.ssh/id_rsa*)
 
     ```
     cd openflight-compute-cluster-builder

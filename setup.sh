@@ -16,7 +16,7 @@ fi
 
 
 # Create SSH keypair
-ssh-keygen -N ''
+ssh-keygen -N '' -f /root/.ssh/id_rsa
 
 # Create deployment script
 cat << EOF > /opt/flight/deployment/setup.sh
