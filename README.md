@@ -2,32 +2,37 @@
 
 This repository contains scripts for the R&D setup of OpenFlight Compute.
 
-
 ## How to Use It
 
 Currently, this is being developed and tested on Azure.
 
-1. Launch the latest OpenFlightHub
+1. Launch the latest Cloud Controller
 
-2. Login, configure cloud access credentials and name the default cluster (this cluster won't be used)
+2. Login and login to cloud CLI tools (`az login` / `aws configure`)
 
 3. Clone the WIP repository
 
     ```
-    git clone https://github.com/ColonelPanicks/openflight-compute-wip
+    git clone https://github.com/openflighthpc/openflight-compute-cluster-builder
     ```
 
-4. Run the setup
+4. Run the setup (*Note: this will create an SSH keypair at /root/.ssh/id_rsa*)
 
     ```
-    cd openflight-compute-wip
+    cd openflight-compute-cluster-builder
     bash setup.sh
     ```
+
+5. Update the config variables to reflect cloud configuration
+
+   ```
+   vim config.sh
+   ```
 
 5. Create a cluster
 
     ```
-    cd openflight-compute-wip
+    cd openflight-compute-cluster-builder
     bash build-cluster.sh CLUSTERNAME 'SSH PUBLIC KEY'
     ```
 
