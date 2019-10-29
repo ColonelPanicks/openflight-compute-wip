@@ -176,26 +176,6 @@
         "[resourceId('Microsoft.Network/networkInterfaces', 'flightcloudclustergateway1network1interface')]"
       ]
     },
-   {
-      "name": "flightcloudclustergateway1/startupscript",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2015-06-15",
-      "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachines/', 'flightcloudclustergateway1')]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Azure.Extensions",
-        "type": "CustomScript",
-        "typeHandlerVersion": "2.0",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-        },
-        "protectedSettings": {
-          "commandToExecute": "[concat('curl http://', parameters('controllerip'), '/deployment/setup.sh |/bin/bash')]"
-        }
-      }
-   },
     {
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[concat('flightcloudclusternode0', copyindex(1), 'pubIP')]",
@@ -295,31 +275,7 @@
       "dependsOn": [
         "nicLoop"
       ]
-    },
-   {
-      "name": "[concat('flightcloudclusternode0', copyindex(1), '/startupscript')]",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "location": "[resourceGroup().location]",
-      "copy": {
-          "name": "computeLoop",
-          "count": "[parameters('computeNodesCount')]"
-      },
-      "apiVersion": "2015-06-15",
-      "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachines/', concat('flightcloudclusternode0', copyindex(1)))]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Azure.Extensions",
-        "type": "CustomScript",
-        "typeHandlerVersion": "2.0",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-        },
-        "protectedSettings": {
-          "commandToExecute": "[concat('curl http://', parameters('controllerip'), '/deployment/setup.sh |/bin/bash')]"
-        }
-      }
-   }
+    }
   ]
 }
 

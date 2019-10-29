@@ -88,7 +88,7 @@ function deploy_azure() {
         controllerip="$CONTROLLERIP" \
         clustername="$CLUSTERNAME" \
         computeNodesCount="$COMPUTENODES" \
-        customdata="$(cat $DIR/templates/cloudinit.txt |base64)"
+        customdata="$(cat $DIR/templates/cloudinit.txt |base64 -w 0)"
 
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters

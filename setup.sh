@@ -20,20 +20,6 @@ fi
 # Create SSH keypair
 ssh-keygen -N '' -f /root/.ssh/id_rsa
 
-# Create deployment script
-cat << EOF > /opt/flight/deployment/setup.sh
-#!/bin/bash
-
-# Variables
-CONTROLLER_SSH_PUB_KEY="$(cat /root/.ssh/id_rsa.pub)"
-
-# Allow SSH from controller
-echo "\$CONTROLLER_SSH_PUB_KEY" >> /root/.ssh/authorized_keys
-
-# Get rid of pesky firewalls
-firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd --add-interface eth0 --zone trusted --permanent && firewall-cmd --reload
-EOF
-
 # Create cloudinit script to replace deployment script
 cat << EOF > $DIR/templates/cloudinit.txt
 #cloud-config
