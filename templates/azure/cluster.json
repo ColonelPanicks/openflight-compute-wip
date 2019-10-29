@@ -26,6 +26,12 @@
               "description": "IP address of the cloud controller to obtain setup script from"
           }
       },
+      "customdata": {
+          "type": "string",
+          "metadata": {
+              "description": "Cloud-init customdata for all systems encoded in base64"
+          }
+      },
       "computeNodesCount": {
           "type": "int",
           "defaultValue": 2,
@@ -144,6 +150,7 @@
             "osProfile": {
           "computerName": "[concat('gateway1.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
+          "customdata": "[parameters('customdata')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
@@ -263,6 +270,7 @@
           "osProfile": {
           "computerName": "[concat('node0', copyindex(1), '.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
+          "customdata": "[parameters('customdata')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {

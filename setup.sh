@@ -4,6 +4,8 @@
 # cluster configurations for cloud
 #
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 ################
 # Set Build IP #
 ################
@@ -30,6 +32,15 @@ echo "\$CONTROLLER_SSH_PUB_KEY" >> /root/.ssh/authorized_keys
 
 # Get rid of pesky firewalls
 firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd --add-interface eth0 --zone trusted --permanent && firewall-cmd --reload
+EOF
+
+# Create cloudinit script to replace deployment script
+cat << EOF > $DIR/templates/cloudinit.txt
+#cloud-config
+runcmd:
+  - echo "$(cat /root/.ssh/id_rsa.pub)" >> /root/.ssh/authorized_keys
+  - firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd --add-interface eth0 --zone trusted --permanent && firewall-cmd --reload
+  - timedatectl set-timezone Europe/London
 EOF
 
 # Get ansible playbook
