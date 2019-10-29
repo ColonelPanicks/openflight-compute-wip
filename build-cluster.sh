@@ -107,11 +107,6 @@ EOF
     run_ansible
 }
 
-#function deploy_aws() {
-#
-#
-#}
-
 function run_ansible() {
     # Run ansible playbook
     cd /root/openflight-ansible-playbook
@@ -129,7 +124,10 @@ case $PLATFORM in
         deploy_azure
     ;;
     "aws")
-        deploy_aws
+        echo "AWS is not a supported platform at this time"
+    ;;
+    *)
+        echo "Unknown platform"
     ;;
 esac
 
