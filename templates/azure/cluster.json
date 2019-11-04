@@ -139,6 +139,7 @@
         "storageProfile": {
           "osDisk": {
             "createOption": "fromImage",
+            "diskSizeGB": "16",
             "managedDisk": {
               "storageAccountType": "Premium_LRS"
             }
@@ -239,6 +240,7 @@
         "storageProfile": {
           "osDisk": {
             "createOption": "fromImage",
+            "diskSizeGB": "16",
             "managedDisk": {
               "storageAccountType": "Premium_LRS"
             }
