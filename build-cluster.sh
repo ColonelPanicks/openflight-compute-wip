@@ -85,7 +85,6 @@ function deploy_azure() {
         --template-file $DIR/templates/azure/cluster.json \
         --parameters sshPublicKey="$SSH_PUB_KEY" \
         sourceimage="$AZURE_SOURCEIMAGE" \
-        controllerip="$CONTROLLERIP" \
         clustername="$CLUSTERNAME" \
         computeNodesCount="$COMPUTENODES" \
         customdata="$(cat $DIR/templates/cloudinit.txt |base64 -w 0)"

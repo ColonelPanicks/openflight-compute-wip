@@ -20,12 +20,6 @@
               "description": "Name of the cluster"
           }
       },
-      "controllerip": {
-          "type": "string",
-          "metadata": {
-              "description": "IP address of the cloud controller to obtain setup script from"
-          }
-      },
       "customdata": {
           "type": "string",
           "metadata": {
