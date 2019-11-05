@@ -109,7 +109,7 @@ EOF
 function run_ansible() {
     # Determine if extra flight env stuff to be run
     if [ "$FLIGHTENVPREPARE" = "true" ] ; then
-        extra_flightenv_var="flightenv_prepare=true"
+        extra_flightenv_var="flightenv_bootstrap=true"
     fi
     # Run ansible playbook
     cd /root/openflight-ansible-playbook
