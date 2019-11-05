@@ -1,4 +1,4 @@
-# OpenFlight Compute WIP
+# OpenFlight Compute Cluster Builder
 
 This repository contains scripts for the R&D setup of OpenFlight Compute.
 
@@ -36,3 +36,6 @@ Currently, this is being developed and tested on Azure.
     bash build-cluster.sh CLUSTERNAME 'SSH PUBLIC KEY'
     ```
 
+## Versioning
+
+The version release tags align with the tags in the openflight-ansible-playbook tags.
