@@ -79,6 +79,19 @@
              "priority": 1000,
              "direction": "Inbound"
            }
+         },
+         {
+         "name": "inbound-vnc",
+           "properties": {
+             "protocol": "TCP",
+             "sourcePortRange": "*",
+             "destinationPortRange": "5901-5910",
+             "sourceAddressPrefix": "*",
+             "destinationAddressPrefix": "*",
+             "access": "Allow",
+             "priority": 1010,
+             "direction": "Inbound"
+           }
          }]
        }
     },
@@ -133,7 +146,7 @@
         "storageProfile": {
           "osDisk": {
             "createOption": "fromImage",
-            "diskSizeGB": "16",
+            "diskSizeGB": "128",
             "managedDisk": {
               "storageAccountType": "Premium_LRS"
             }
