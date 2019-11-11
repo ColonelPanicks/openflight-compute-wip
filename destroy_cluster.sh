@@ -31,6 +31,7 @@ function destroy_cluster {
             exit 1
             ;;
     esac
+    rm -f /opt/flight/clusters/$cluster
 }
 
 function destroy_cluster_azure {
