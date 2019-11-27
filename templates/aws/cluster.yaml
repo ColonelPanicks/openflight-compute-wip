@@ -147,3 +147,307 @@ Resources:
       NetworkInterfaceId: !Ref flightcloudclustergateway1network1interface
       AllocationId: !GetAtt flightcloudclustergateway1pubIP.AllocationId
 
+  flightcloudclusternode01network1interface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SourceDestCheck: false
+      GroupSet:
+        - !Ref flightcloudclustersecuritygroup
+      SubnetId: !Ref flightcloudclusternetwork1
+
+  flightcloudclusternode01:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !Ref sourceimage
+      InstanceType: t2.micro
+      Monitoring: true
+      KeyName: !Ref sshKeyName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref flightcloudclusternode01network1interface
+          DeviceIndex: 0
+      UserData: !Ref customdata
+
+  flightcloudclusternode01pubIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  flightcloudclusternode01pubIPassociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      NetworkInterfaceId: !Ref flightcloudclusternode01network1interface
+      AllocationId: !GetAtt flightcloudclusternode01pubIP.AllocationId
+
+  flightcloudclusternode02network1interface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SourceDestCheck: false
+      GroupSet:
+        - !Ref flightcloudclustersecuritygroup
+      SubnetId: !Ref flightcloudclusternetwork1
+
+  flightcloudclusternode02:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !Ref sourceimage
+      InstanceType: t2.micro
+      Monitoring: true
+      KeyName: !Ref sshKeyName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref flightcloudclusternode02network1interface
+          DeviceIndex: 0
+      UserData: !Ref customdata
+
+  flightcloudclusternode02pubIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  flightcloudclusternode02pubIPassociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      NetworkInterfaceId: !Ref flightcloudclusternode02network1interface
+      AllocationId: !GetAtt flightcloudclusternode02pubIP.AllocationId
+
+  flightcloudclusternode03network1interface:
+    Type: AWS::EC2::NetworkInterface
+    Condition: CreateNode03
+    Properties:
+      SourceDestCheck: false
+      GroupSet:
+        - !Ref flightcloudclustersecuritygroup
+      SubnetId: !Ref flightcloudclusternetwork1
+
+  flightcloudclusternode03:
+    Type: AWS::EC2::Instance
+    Condition: CreateNode03
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !Ref sourceimage
+      InstanceType: t2.micro
+      Monitoring: true
+      KeyName: !Ref sshKeyName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref flightcloudclusternode03network1interface
+          DeviceIndex: 0
+      UserData: !Ref customdata
+
+  flightcloudclusternode03pubIP:
+    Type: AWS::EC2::EIP
+    Condition: CreateNode03
+    Properties:
+      Domain: vpc
+
+  flightcloudclusternode03pubIPassociation:
+    Type: AWS::EC2::EIPAssociation
+    Condition: CreateNode03
+    Properties:
+      NetworkInterfaceId: !Ref flightcloudclusternode03network1interface
+      AllocationId: !GetAtt flightcloudclusternode03pubIP.AllocationId
+
+  flightcloudclusternode04network1interface:
+    Type: AWS::EC2::NetworkInterface
+    Condition: CreateNode04
+    Properties:
+      SourceDestCheck: false
+      GroupSet:
+        - !Ref flightcloudclustersecuritygroup
+      SubnetId: !Ref flightcloudclusternetwork1
+
+  flightcloudclusternode04:
+    Type: AWS::EC2::Instance
+    Condition: CreateNode04
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !Ref sourceimage
+      InstanceType: t2.micro
+      Monitoring: true
+      KeyName: !Ref sshKeyName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref flightcloudclusternode04network1interface
+          DeviceIndex: 0
+      UserData: !Ref customdata
+
+  flightcloudclusternode04pubIP:
+    Type: AWS::EC2::EIP
+    Condition: CreateNode04
+    Properties:
+      Domain: vpc
+
+  flightcloudclusternode04pubIPassociation:
+    Type: AWS::EC2::EIPAssociation
+    Condition: CreateNode04
+    Properties:
+      NetworkInterfaceId: !Ref flightcloudclusternode04network1interface
+      AllocationId: !GetAtt flightcloudclusternode04pubIP.AllocationId
+
+  flightcloudclusternode05network1interface:
+    Type: AWS::EC2::NetworkInterface
+    Condition: CreateNode05
+    Properties:
+      SourceDestCheck: false
+      GroupSet:
+        - !Ref flightcloudclustersecuritygroup
+      SubnetId: !Ref flightcloudclusternetwork1
+
+  flightcloudclusternode05:
+    Type: AWS::EC2::Instance
+    Condition: CreateNode05
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !Ref sourceimage
+      InstanceType: t2.micro
+      Monitoring: true
+      KeyName: !Ref sshKeyName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref flightcloudclusternode05network1interface
+          DeviceIndex: 0
+      UserData: !Ref customdata
+
+  flightcloudclusternode05pubIP:
+    Type: AWS::EC2::EIP
+    Condition: CreateNode05
+    Properties:
+      Domain: vpc
+
+  flightcloudclusternode05pubIPassociation:
+    Type: AWS::EC2::EIPAssociation
+    Condition: CreateNode05
+    Properties:
+      NetworkInterfaceId: !Ref flightcloudclusternode05network1interface
+      AllocationId: !GetAtt flightcloudclusternode05pubIP.AllocationId
+
+  flightcloudclusternode06network1interface:
+    Type: AWS::EC2::NetworkInterface
+    Condition: CreateNode06
+    Properties:
+      SourceDestCheck: false
+      GroupSet:
+        - !Ref flightcloudclustersecuritygroup
+      SubnetId: !Ref flightcloudclusternetwork1
+
+  flightcloudclusternode06:
+    Type: AWS::EC2::Instance
+    Condition: CreateNode06
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !Ref sourceimage
+      InstanceType: t2.micro
+      Monitoring: true
+      KeyName: !Ref sshKeyName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref flightcloudclusternode06network1interface
+          DeviceIndex: 0
+      UserData: !Ref customdata
+
+  flightcloudclusternode06pubIP:
+    Type: AWS::EC2::EIP
+    Condition: CreateNode06
+    Properties:
+      Domain: vpc
+
+  flightcloudclusternode06pubIPassociation:
+    Type: AWS::EC2::EIPAssociation
+    Condition: CreateNode06
+    Properties:
+      NetworkInterfaceId: !Ref flightcloudclusternode06network1interface
+      AllocationId: !GetAtt flightcloudclusternode06pubIP.AllocationId
+
+  flightcloudclusternode07network1interface:
+    Type: AWS::EC2::NetworkInterface
+    Condition: CreateNode07
+    Properties:
+      SourceDestCheck: false
+      GroupSet:
+        - !Ref flightcloudclustersecuritygroup
+      SubnetId: !Ref flightcloudclusternetwork1
+
+  flightcloudclusternode07:
+    Type: AWS::EC2::Instance
+    Condition: CreateNode07
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !Ref sourceimage
+      InstanceType: t2.micro
+      Monitoring: true
+      KeyName: !Ref sshKeyName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref flightcloudclusternode07network1interface
+          DeviceIndex: 0
+      UserData: !Ref customdata
+
+  flightcloudclusternode07pubIP:
+    Type: AWS::EC2::EIP
+    Condition: CreateNode07
+    Properties:
+      Domain: vpc
+
+  flightcloudclusternode07pubIPassociation:
+    Type: AWS::EC2::EIPAssociation
+    Condition: CreateNode07
+    Properties:
+      NetworkInterfaceId: !Ref flightcloudclusternode07network1interface
+      AllocationId: !GetAtt flightcloudclusternode07pubIP.AllocationId
+
+  flightcloudclusternode08network1interface:
+    Type: AWS::EC2::NetworkInterface
+    Condition: CreateNode08
+    Properties:
+      SourceDestCheck: false
+      GroupSet:
+        - !Ref flightcloudclustersecuritygroup
+      SubnetId: !Ref flightcloudclusternetwork1
+
+  flightcloudclusternode08:
+    Type: AWS::EC2::Instance
+    Condition: CreateNode08
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !Ref sourceimage
+      InstanceType: t2.micro
+      Monitoring: true
+      KeyName: !Ref sshKeyName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref flightcloudclusternode08network1interface
+          DeviceIndex: 0
+      UserData: !Ref customdata
+
+  flightcloudclusternode08pubIP:
+    Type: AWS::EC2::EIP
+    Condition: CreateNode08
+    Properties:
+      Domain: vpc
+
+  flightcloudclusternode08pubIPassociation:
+    Type: AWS::EC2::EIPAssociation
+    Condition: CreateNode08
+    Properties:
+      NetworkInterfaceId: !Ref flightcloudclusternode08network1interface
+      AllocationId: !GetAtt flightcloudclusternode08pubIP.AllocationId
+
