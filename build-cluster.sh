@@ -24,6 +24,7 @@ CLUSTERNAME="$CLUSTERNAMEARG-$SEED"
 
 # The host IP which is sharing setup.sh script at http://IP/deployment/setup.sh
 CONTROLLERIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
+GATEWAYIP="Unknown"
 
 #################
 # Checking Args #
@@ -89,11 +90,13 @@ function deploy_azure() {
         computeNodesCount="$COMPUTENODES" \
         customdata="$(cat $DIR/templates/cloudinit.txt |base64 -w 0)"
 
+    GATEWAYIP=$(az network public-ip show -g $CLUSTERNAME -n flightcloudclustergateway1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
+
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
     cat << EOF > /opt/flight/clusters/$CLUSTERNAME
 [gateway]
-gateway1    ansible_host=$(az network public-ip show -g $CLUSTERNAME -n flightcloudclustergateway1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
+gateway1    ansible_host=$GATEWAYIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
@@ -136,11 +139,13 @@ function deploy_aws() {
         computeNodesCount="$COMPUTENODES" \
         customdata="$(cat $DIR/templates/cloudinit.txt |base64 -w 0)"
 
+    GATEWAYIP=$(aws cloudformation describe-stack-resources --stack-name $CLUSTERNAME --logical-resource-id flightcloudclustergateway1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
+
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
     cat << EOF > /opt/flight/clusters/$CLUSTERNAME
 [gateway]
-gateway1    ansible_host=$(aws cloudformation describe-stack-resources --stack-name $CLUSTERNAME --logical-resource-id flightcloudclustergateway1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
+gateway1    ansible_host=$GATEWAYIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
@@ -183,4 +188,4 @@ case $PLATFORM in
 esac
 
 
-echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | End Deploy | Gateway1 IP: $(az network public-ip show -g $CLUSTERNAME -n flightcloudclustergateway1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')" |tee -a $LOG
+echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | End Deploy | Gateway1 IP: $GATEWAYIP" |tee -a $LOG
