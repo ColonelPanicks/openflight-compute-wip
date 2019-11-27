@@ -154,7 +154,7 @@ function deploy_aws() {
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
         customdata="$CUSTOMDATA"
-    aws stack-create-complete --stack-name $CLUSTERNAME
+    aws cloudformation wait stack-create-complete --stack-name $CLUSTERNAME --region "$AWS_LOCATION"
 
     GATEWAYIP=$(aws cloudformation describe-stack-resources --stack-name $CLUSTERNAME --logical-resource-id flightcloudclustergateway1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
 
