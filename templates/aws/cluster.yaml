@@ -20,12 +20,12 @@ Parameters:
     MaxValue: 8
     Description: 'Number of compute nodes to include in cluster'
 Conditions:
-  CreateNode3: !Or [ !Equals [ !Ref computeNodesCount, 3 ], !Equals [ !Ref computeNodesCount, 4 ], !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
-  CreateNode4: !Or [ !Equals [ !Ref computeNodesCount, 4 ], !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
-  CreateNode5: !Or [ !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
-  CreateNode6: !Or [ !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
-  CreateNode7: !Or [ !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
-  CreateNode8: !Equals [ !Ref computeNodesCount, 8 ]
+  CreateNode03: !Or [ !Equals [ !Ref computeNodesCount, 3 ], !Equals [ !Ref computeNodesCount, 4 ], !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
+  CreateNode04: !Or [ !Equals [ !Ref computeNodesCount, 4 ], !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
+  CreateNode05: !Or [ !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
+  CreateNode06: !Or [ !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
+  CreateNode07: !Or [ !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
+  CreateNode08: !Equals [ !Ref computeNodesCount, 8 ]
 Resources:
   flightcloudclusternetwork:
     Type: AWS::EC2::VPC
@@ -121,7 +121,7 @@ Resources:
       SubnetId: !Ref flightcloudclusternetwork1
 
   flightcloudclustergateway1:
-        Type: AWS::EC2::Instance
+    Type: AWS::EC2::Instance
     Properties:
       AvailabilityZone: !Select
         - 0
