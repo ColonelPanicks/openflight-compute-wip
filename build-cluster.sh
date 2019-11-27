@@ -106,6 +106,53 @@ EOF
     run_ansible
 }
 
+function check_aws() {
+    # Azure variables are non-empty
+    if [ -z "${AWS_SOURCEIMAGE}" ] ; then
+        echo "AWS_SOURCEIMAGE is not set in config.sh"
+        echo "Set this before running script again"
+        exit 1
+    elif [ -z "${AWS_LOCATION}" ] ; then
+        echo "AWS_LOCATION is not set in config.sh"
+        echo "Set this before running script again"
+        exit 1
+    fi
+
+    # Azure login configured
+    if ! aws sts get-caller-identity > /dev/null 2>&1 ; then
+        echo "AWS account not connected to CLI"
+        echo "Run aws configure to connect your account"
+        exit 1
+    fi
+}
+
+function deploy_aws() {
+    # Deploy resources
+    aws cloudformation deploy --template-file $DIR/templates/aws/cluster.yaml --stack-name $CLUSTERNAME \
+        --region "$AWS_LOCATION" \
+        --parameter-overrides sshPublicKey="$SSH_PUB_KEY" \
+        sourceimage="$AWS_SOURCEIMAGE" \
+        clustername="$CLUSTERNAMEARG" \
+        computeNodesCount="$COMPUTENODES" \
+        customdata="$(cat $DIR/templates/cloudinit.txt |base64 -w 0)"
+
+    # Create ansible hosts file
+    mkdir -p /opt/flight/clusters
+    cat << EOF > /opt/flight/clusters/$CLUSTERNAME
+[gateway]
+gateway1    ansible_host=$(aws cloudformation describe-stack-resources --stack-name $CLUSTERNAME --logical-resource-id flightcloudclustergateway1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
+
+[nodes]
+$(i=1 ; while [ $i -le $COMPUTENODES ] ; do
+echo "node0$i    ansible_host=$(aws cloudformation describe-stack-resources --stack-name $CLUSTERNAME --logical-resource-id flightcloudclusternode0$i\pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")"
+i=$((i + 1))
+done)
+EOF
+
+    # Customise nodes
+    run_ansible
+}
+
 function run_ansible() {
     # Determine if extra flight env stuff to be run
     if [ "$FLIGHTENVPREPARE" = "true" ] ; then
@@ -127,7 +174,8 @@ case $PLATFORM in
         deploy_azure
     ;;
     "aws")
-        echo "AWS is not a supported platform at this time"
+        check_aws
+        deploy_aws
     ;;
     *)
         echo "Unknown platform"
