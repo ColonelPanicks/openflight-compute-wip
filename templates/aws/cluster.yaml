@@ -109,6 +109,56 @@ Resources:
           CidrIp: '0.0.0.0/0'
           Description: 'Allow outbound internet access'
 
+  flightcloudclusterprivatedns:
+      Type: AWS::Route53::HostedZone
+      DependsOn: flightcloudclusternetwork
+      Properties:
+        HostedZoneConfig:
+          Comment: "Private DNS for a flightcloudcluster"
+        Name: flightcloudclusterprivatednszone
+        VPCs:
+        - VPCId: !Ref flightcloudclusternetwork
+          VPCRegion: !Ref 'AWS::Region'
+
+  dnsgateway1:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        HostedZoneName: !Ref flightcloudclusterprivatedns
+        Comment: Entry for gateway1
+        Name: !Sub
+          - "gateway1.pri.${cn}.cluster.local"
+          - { cn: !Ref clustername }
+        Type: A
+        TTL: '900'
+        ResourceRecords:
+        - !GetAtt flightcloudclustergateway1.PrivateIp
+
+  dnsnode01:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        HostedZoneName: !Ref flightcloudclusterprivatedns
+        Comment: Entry for node01
+        Name: !Sub
+          - "node01.pri.${cn}.cluster.local"
+          - { cn: !Ref clustername }
+        Type: A
+        TTL: '900'
+        ResourceRecords:
+        - !GetAtt flightcloudclusternode01.PrivateIp
+
+  dnsnode02:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        HostedZoneName: !Ref flightcloudclusterprivatedns
+        Comment: Entry for node02
+        Name: !Sub
+          - "node02.pri.${cn}.cluster.local"
+          - { cn: !Ref clustername }
+        Type: A
+        TTL: '900'
+        ResourceRecords:
+        - !GetAtt flightcloudclusternode02.PrivateIp
+
   flightcloudclustergateway1network1interface:
     Type: AWS::EC2::NetworkInterface
     Properties:
