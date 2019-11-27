@@ -1,9 +1,6 @@
 ---
 Description: 'Flight Domain Template'
 Parameters:
-  sshKeyName:
-    Type: String
-    Description: 'EC2 KeyPair name to enable SSH access to the cluster'
   sourceimage:
     Type: String
     Description: 'AMI ID to use for nodes'
@@ -129,7 +126,6 @@ Resources:
       ImageId: !Ref sourceimage
       InstanceType: t2.micro
       Monitoring: true
-      KeyName: !Ref sshKeyName
       NetworkInterfaces:
         -
           NetworkInterfaceId: !Ref flightcloudclustergateway1network1interface
@@ -164,7 +160,6 @@ Resources:
       ImageId: !Ref sourceimage
       InstanceType: t2.micro
       Monitoring: true
-      KeyName: !Ref sshKeyName
       NetworkInterfaces:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode01network1interface
@@ -199,7 +194,6 @@ Resources:
       ImageId: !Ref sourceimage
       InstanceType: t2.micro
       Monitoring: true
-      KeyName: !Ref sshKeyName
       NetworkInterfaces:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode02network1interface
@@ -236,7 +230,6 @@ Resources:
       ImageId: !Ref sourceimage
       InstanceType: t2.micro
       Monitoring: true
-      KeyName: !Ref sshKeyName
       NetworkInterfaces:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode03network1interface
@@ -275,7 +268,6 @@ Resources:
       ImageId: !Ref sourceimage
       InstanceType: t2.micro
       Monitoring: true
-      KeyName: !Ref sshKeyName
       NetworkInterfaces:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode04network1interface
@@ -314,7 +306,6 @@ Resources:
       ImageId: !Ref sourceimage
       InstanceType: t2.micro
       Monitoring: true
-      KeyName: !Ref sshKeyName
       NetworkInterfaces:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode05network1interface
@@ -353,7 +344,6 @@ Resources:
       ImageId: !Ref sourceimage
       InstanceType: t2.micro
       Monitoring: true
-      KeyName: !Ref sshKeyName
       NetworkInterfaces:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode06network1interface
@@ -392,7 +382,6 @@ Resources:
       ImageId: !Ref sourceimage
       InstanceType: t2.micro
       Monitoring: true
-      KeyName: !Ref sshKeyName
       NetworkInterfaces:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode07network1interface
@@ -431,7 +420,6 @@ Resources:
       ImageId: !Ref sourceimage
       InstanceType: t2.micro
       Monitoring: true
-      KeyName: !Ref sshKeyName
       NetworkInterfaces:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode08network1interface
