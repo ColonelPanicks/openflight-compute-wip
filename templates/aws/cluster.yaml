@@ -1,0 +1,149 @@
+---
+Description: 'Flight Domain Template'
+Parameters:
+  sshKeyName:
+    Type: String
+    Description: 'EC2 KeyPair name to enable SSH access to the cluster'
+  sourceimage:
+    Type: String
+    Description: 'AMI ID to use for nodes'
+  clustername:
+    Type: String
+    Description: 'Name of the cluster'
+  customdata:
+    Type: String
+    Description: 'Cloud-init customdata for all systems encoded in base64'
+  computeNodesCount: 
+    Type: Number
+    Default: 2
+    MinValue: 2
+    MaxValue: 8
+    Description: 'Number of compute nodes to include in cluster'
+Conditions:
+  CreateNode3: !Or [ !Equals [ !Ref computeNodesCount, 3 ], !Equals [ !Ref computeNodesCount, 4 ], !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
+  CreateNode4: !Or [ !Equals [ !Ref computeNodesCount, 4 ], !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
+  CreateNode5: !Or [ !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
+  CreateNode6: !Or [ !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
+  CreateNode7: !Or [ !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
+  CreateNode8: !Equals [ !Ref computeNodesCount, 8 ]
+Resources:
+  flightcloudclusternetwork:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.10.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  flightcloudclusterinternetgateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: flightcloudclusternetwork
+
+  flightcloudclusterinternetgatewayattachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref flightcloudclusterinternetgateway
+      VpcId: !Ref flightcloudclusternetwork
+
+  flightcloudclusterroutetable:
+    Type: AWS::EC2::RouteTable
+    DependsOn: flightcloudclusterinternetgatewayattachment
+    Properties:
+      VpcId: !Ref flightcloudclusternetwork
+
+  flightcloudclusternetwork1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.10.0.0/19
+      VpcId: !Ref flightcloudclusternetwork
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  flightcloudclusternetwork1subnetroutetableassocation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref flightcloudclusternetwork1
+      RouteTableId: !Ref flightcloudclusterroutetable
+
+  flightcloudclusterrouteinternetgateway:
+    Type: AWS::EC2::Route
+    DependsOn: flightcloudclusterinternetgatewayattachment
+    Properties:
+      RouteTableId: !Ref flightcloudclusterroutetable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref flightcloudclusterinternetgateway
+
+  flightcloudclustersecuritygroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: flightcloudcluster
+      GroupDescription: 'Primary SG for basic'
+      VpcId: !Ref flightcloudclusternetwork
+      SecurityGroupIngress:
+        -
+          IpProtocol: '-1'
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: '10.10.0.0/16'
+          Description: 'Allow all traffic for cluster VPC'
+        -
+          IpProtocol: 'tcp'
+          FromPort: 22
+          ToPort: 22
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow inbound SSH access'
+        -
+          IpProtocol: 'tcp'
+          FromPort: 5901
+          ToPort: 5911
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow 10 VNC sessions'
+        -
+          IpProtocol: 'icmp'
+          FromPort: '8'
+          ToPort: '-1'
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow ping'
+      SecurityGroupEgress:
+        -
+          IpProtocol: '-1'
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: '0.0.0.0/0'
+          Description: 'Allow outbound internet access'
+
+  flightcloudclustergateway1network1interface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SourceDestCheck: false
+      GroupSet:
+        - !Ref flightcloudclustersecuritygroup
+      SubnetId: !Ref flightcloudclusternetwork1
+
+  flightcloudclustergateway1:
+        Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      ImageId: !Ref sourceimage
+      InstanceType: t2.micro
+      Monitoring: true
+      KeyName: !Ref sshKeyName
+      NetworkInterfaces:
+        -
+          NetworkInterfaceId: !Ref flightcloudclustergateway1network1interface
+          DeviceIndex: 0
+      UserData: !Ref customdata
+
+  flightcloudclustergateway1pubIP: 
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  flightcloudclustergateway1pubIPassociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      NetworkInterfaceId: !Ref flightcloudclustergateway1network1interface
+      AllocationId: !GetAtt flightcloudclustergateway1pubIP.AllocationId
+
