@@ -60,6 +60,22 @@ echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | $
 # Functions #
 #############
 
+function generate_custom_data() {
+    DATA=$(cat << EOF
+#cloud-config
+system_info:
+  default_user:
+    name: flight
+runcmd:
+  - echo "$(cat /root/.ssh/id_rsa.pub)" >> /root/.ssh/authorized_keys
+  - echo "$SSH_PUB_KEY" >> /home/flight/.ssh/authorized_keys
+  - firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd --add-interface eth0 --zone trusted --permanent && firewall-cmd --reload
+  - timedatectl set-timezone Europe/London
+EOF
+)
+    CUSTOMDATA=$(echo "$DATA" |base64 -w 0)
+}
+
 function check_azure() {
     # Azure variables are non-empty
     if [ -z "${AZURE_SOURCEIMAGE}" ] ; then
@@ -88,7 +104,7 @@ function deploy_azure() {
         sourceimage="$AZURE_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
-        customdata="$(cat $DIR/templates/cloudinit.txt |base64 -w 0)"
+        customdata="$CUSTOMDATA"
 
     GATEWAYIP=$(az network public-ip show -g $CLUSTERNAME -n flightcloudclustergateway1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
 
@@ -137,7 +153,7 @@ function deploy_aws() {
         sourceimage="$AWS_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
-        customdata="$(cat $DIR/templates/cloudinit.txt |base64 -w 0)"
+        customdata="$CUSTOMDATA"
     aws stack-create-complete --stack-name $CLUSTERNAME
 
     GATEWAYIP=$(aws cloudformation describe-stack-resources --stack-name $CLUSTERNAME --logical-resource-id flightcloudclustergateway1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
@@ -173,6 +189,8 @@ function run_ansible() {
 #################
 # Run Functions #
 #################
+
+generate_custom_data
 
 case $PLATFORM in
     "azure")
