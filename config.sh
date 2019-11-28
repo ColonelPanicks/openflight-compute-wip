@@ -4,7 +4,7 @@
 # General Configuration
 #
 
-# Currently only Azure is supported
+# Either 'azure' or 'aws'
 PLATFORM="azure"
 # A value between 2 and 8
 COMPUTENODES="2"
@@ -25,3 +25,13 @@ AZURE_SOURCEIMAGE=""
 # Example: "UK South"
 AZURE_LOCATION=""
 
+
+#
+# AWS Configuration
+#
+
+# Example: ami-abcd123efgh5678
+AWS_SOURCEIMAGE=""
+
+# Example: "eu-west-1"
+AWS_LOCATION=""

@@ -24,6 +24,7 @@ CLUSTERNAME="$CLUSTERNAMEARG-$SEED"
 
 # The host IP which is sharing setup.sh script at http://IP/deployment/setup.sh
 CONTROLLERIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
+GATEWAYIP="Unknown"
 
 #################
 # Checking Args #
@@ -59,6 +60,22 @@ echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | $
 # Functions #
 #############
 
+function generate_custom_data() {
+    DATA=$(cat << EOF
+#cloud-config
+system_info:
+  default_user:
+    name: flight
+runcmd:
+  - echo "$(cat /root/.ssh/id_rsa.pub)" >> /root/.ssh/authorized_keys
+  - echo "$SSH_PUB_KEY" >> /home/flight/.ssh/authorized_keys
+  - firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd --add-interface eth0 --zone trusted --permanent && firewall-cmd --reload
+  - timedatectl set-timezone Europe/London
+EOF
+)
+    CUSTOMDATA=$(echo "$DATA" |base64 -w 0)
+}
+
 function check_azure() {
     # Azure variables are non-empty
     if [ -z "${AZURE_SOURCEIMAGE}" ] ; then
@@ -87,13 +104,15 @@ function deploy_azure() {
         sourceimage="$AZURE_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
-        customdata="$(cat $DIR/templates/cloudinit.txt |base64 -w 0)"
+        customdata="$CUSTOMDATA"
+
+    GATEWAYIP=$(az network public-ip show -g $CLUSTERNAME -n flightcloudclustergateway1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
 
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
     cat << EOF > /opt/flight/clusters/$CLUSTERNAME
 [gateway]
-gateway1    ansible_host=$(az network public-ip show -g $CLUSTERNAME -n flightcloudclustergateway1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
+gateway1    ansible_host=$GATEWAYIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
@@ -102,6 +121,56 @@ i=$((i + 1))
 done)
 EOF
     
+    # Customise nodes
+    run_ansible
+}
+
+function check_aws() {
+    # Azure variables are non-empty
+    if [ -z "${AWS_SOURCEIMAGE}" ] ; then
+        echo "AWS_SOURCEIMAGE is not set in config.sh"
+        echo "Set this before running script again"
+        exit 1
+    elif [ -z "${AWS_LOCATION}" ] ; then
+        echo "AWS_LOCATION is not set in config.sh"
+        echo "Set this before running script again"
+        exit 1
+    fi
+
+    # Azure login configured
+    if ! aws sts get-caller-identity > /dev/null 2>&1 ; then
+        echo "AWS account not connected to CLI"
+        echo "Run aws configure to connect your account"
+        exit 1
+    fi
+}
+
+function deploy_aws() {
+    # Deploy resources
+    aws cloudformation deploy --template-file $DIR/templates/aws/cluster.yaml --stack-name $CLUSTERNAME \
+        --region "$AWS_LOCATION" \
+        --parameter-overrides sshPublicKey="$SSH_PUB_KEY" \
+        sourceimage="$AWS_SOURCEIMAGE" \
+        clustername="$CLUSTERNAMEARG" \
+        computeNodesCount="$COMPUTENODES" \
+        customdata="$CUSTOMDATA"
+    aws cloudformation wait stack-create-complete --stack-name $CLUSTERNAME --region "$AWS_LOCATION"
+
+    GATEWAYIP=$(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id flightcloudclustergateway1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
+
+    # Create ansible hosts file
+    mkdir -p /opt/flight/clusters
+    cat << EOF > /opt/flight/clusters/$CLUSTERNAME
+[gateway]
+gateway1    ansible_host=$GATEWAYIP
+
+[nodes]
+$(i=1 ; while [ $i -le $COMPUTENODES ] ; do
+echo "node0$i    ansible_host=$(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id flightcloudclusternode0$i\pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")"
+i=$((i + 1))
+done)
+EOF
+
     # Customise nodes
     run_ansible
 }
@@ -121,13 +190,16 @@ function run_ansible() {
 # Run Functions #
 #################
 
+generate_custom_data
+
 case $PLATFORM in
     "azure")
         check_azure
         deploy_azure
     ;;
     "aws")
-        echo "AWS is not a supported platform at this time"
+        check_aws
+        deploy_aws
     ;;
     *)
         echo "Unknown platform"
@@ -135,4 +207,4 @@ case $PLATFORM in
 esac
 
 
-echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | End Deploy | Gateway1 IP: $(az network public-ip show -g $CLUSTERNAME -n flightcloudclustergateway1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')" |tee -a $LOG
+echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | End Deploy | Gateway1 IP: $GATEWAYIP" |tee -a $LOG
