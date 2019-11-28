@@ -8,7 +8,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Source variables
-source $DIR/config.sh
+source $DIR/configs/config.sh
 
 CLUSTERS="$(ls /opt/flight/clusters/)"
 CLUSTERNAME="$1"

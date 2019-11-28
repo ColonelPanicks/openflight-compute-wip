@@ -9,6 +9,12 @@ PLATFORM="azure"
 # A value between 2 and 8
 COMPUTENODES="2"
 
+# Public SSH key for user access
+## Note: This will be overwritten if an SSH key is given
+## on the CLI
+#SSH_PUB_KEY=""
+
+
 # If true then the ansible-playbook will run additional
 # configuration steps for the flight environment to ensure
 # dependencies for the desktop and software environments

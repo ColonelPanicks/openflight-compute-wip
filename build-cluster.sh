@@ -12,10 +12,21 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Source variables
-source $DIR/config.sh
+if [ -z "${CONFIG}" ] ; then
+    source $DIR/configs/config.sh
+else
+    config_path=$DIR/configs/$CONFIG.sh
+    if [ -f $config_path ] ; then
+        source $config_path
+    else
+        echo "Error loading $CONFIG"
+        echo "Could not load $config_path"
+        exit 1
+    fi
+fi
 
 CLUSTERNAMEARG="$1"
-SSH_PUB_KEY="$2"
+SSH_PUB_KEY="${2:-$SSH_PUB_KEY}"
 
 LOG="$DIR/log/deploy.log"
 
