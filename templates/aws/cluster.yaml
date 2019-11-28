@@ -170,6 +170,108 @@ Resources:
         ResourceRecords:
         - !GetAtt flightcloudclusternode02.PrivateIp
 
+  dnsnode03:
+      Type: AWS::Route53::RecordSet
+      Condition: CreateNode03
+      DependsOn: flightcloudclusterprivatedns
+      Properties:
+        HostedZoneName: !Sub
+          - "pri.${cn}.cluster.local."
+          - { cn: !Ref clustername }
+        Comment: Entry for node03
+        Name: !Sub
+          - "node03.pri.${cn}.cluster.local"
+          - { cn: !Ref clustername }
+        Type: A
+        TTL: '900'
+        ResourceRecords:
+        - !GetAtt flightcloudclusternode03.PrivateIp
+
+  dnsnode04:
+      Type: AWS::Route53::RecordSet
+      Condition: CreateNode04
+      DependsOn: flightcloudclusterprivatedns
+      Properties:
+        HostedZoneName: !Sub
+          - "pri.${cn}.cluster.local."
+          - { cn: !Ref clustername }
+        Comment: Entry for node04
+        Name: !Sub
+          - "node04.pri.${cn}.cluster.local"
+          - { cn: !Ref clustername }
+        Type: A
+        TTL: '900'
+        ResourceRecords:
+        - !GetAtt flightcloudclusternode04.PrivateIp
+
+  dnsnode05:
+      Type: AWS::Route53::RecordSet
+      Condition: CreateNode05
+      DependsOn: flightcloudclusterprivatedns
+      Properties:
+        HostedZoneName: !Sub
+          - "pri.${cn}.cluster.local."
+          - { cn: !Ref clustername }
+        Comment: Entry for node05
+        Name: !Sub
+          - "node05.pri.${cn}.cluster.local"
+          - { cn: !Ref clustername }
+        Type: A
+        TTL: '900'
+        ResourceRecords:
+        - !GetAtt flightcloudclusternode05.PrivateIp
+
+  dnsnode06:
+      Type: AWS::Route53::RecordSet
+      Condition: CreateNode06
+      DependsOn: flightcloudclusterprivatedns
+      Properties:
+        HostedZoneName: !Sub
+          - "pri.${cn}.cluster.local."
+          - { cn: !Ref clustername }
+        Comment: Entry for node06
+        Name: !Sub
+          - "node06.pri.${cn}.cluster.local"
+          - { cn: !Ref clustername }
+        Type: A
+        TTL: '900'
+        ResourceRecords:
+        - !GetAtt flightcloudclusternode06.PrivateIp
+
+  dnsnode07:
+      Type: AWS::Route53::RecordSet
+      Condition: CreateNode07
+      DependsOn: flightcloudclusterprivatedns
+      Properties:
+        HostedZoneName: !Sub
+          - "pri.${cn}.cluster.local."
+          - { cn: !Ref clustername }
+        Comment: Entry for node07
+        Name: !Sub
+          - "node07.pri.${cn}.cluster.local"
+          - { cn: !Ref clustername }
+        Type: A
+        TTL: '900'
+        ResourceRecords:
+        - !GetAtt flightcloudclusternode07.PrivateIp
+
+  dnsnode08:
+      Type: AWS::Route53::RecordSet
+      Condition: CreateNode08
+      DependsOn: flightcloudclusterprivatedns
+      Properties:
+        HostedZoneName: !Sub
+          - "pri.${cn}.cluster.local."
+          - { cn: !Ref clustername }
+        Comment: Entry for node08
+        Name: !Sub
+          - "node08.pri.${cn}.cluster.local"
+          - { cn: !Ref clustername }
+        Type: A
+        TTL: '900'
+        ResourceRecords:
+        - !GetAtt flightcloudclusternode08.PrivateIp
+
   flightcloudclustergateway1network1interface:
     Type: AWS::EC2::NetworkInterface
     Properties:
