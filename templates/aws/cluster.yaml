@@ -124,6 +124,7 @@ Resources:
 
   dnsgateway1:
       Type: AWS::Route53::RecordSet
+      DependsOn: flightcloudclusterprivatedns
       Properties:
         HostedZoneName: !Sub
           - "pri.${cn}.cluster.local."
@@ -139,6 +140,7 @@ Resources:
 
   dnsnode01:
       Type: AWS::Route53::RecordSet
+      DependsOn: flightcloudclusterprivatedns
       Properties:
         HostedZoneName: !Sub
           - "pri.${cn}.cluster.local."
@@ -154,6 +156,7 @@ Resources:
 
   dnsnode02:
       Type: AWS::Route53::RecordSet
+      DependsOn: flightcloudclusterprivatedns
       Properties:
         HostedZoneName: !Sub
           - "pri.${cn}.cluster.local."
