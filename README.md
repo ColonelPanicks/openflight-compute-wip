@@ -8,9 +8,9 @@ Currently, this is being developed and tested on Azure.
 
 1. Launch the latest Cloud Controller
 
-2. Login and login to cloud CLI tools (`az login` / `aws configure`)
+2. Login to the controller and authorise cloud CLI tools (`az login` / `aws configure`)
 
-3. Clone the WIP repository
+3. Clone the cluster builder repository
 
     ```
     git clone https://github.com/openflighthpc/openflight-compute-cluster-builder
