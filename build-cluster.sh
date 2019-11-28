@@ -13,7 +13,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Source variables
 if [ -z "${CONFIG}" ] ; then
-    source $DIR/configs/config.sh
+    source $DIR/configs/default.sh
 else
     config_path=$DIR/configs/$CONFIG.sh
     if [ -f $config_path ] ; then
