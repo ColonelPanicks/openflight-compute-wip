@@ -149,7 +149,7 @@
             "id": "[parameters('sourceimage')]"
           }
         },
-            "osProfile": {
+        "osProfile": {
           "computerName": "[concat('gateway1.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
           "customdata": "[parameters('customdata')]",
@@ -157,7 +157,6 @@
             "disablePasswordAuthentication": true
             }
           }
-        },
         "networkProfile": {
           "networkInterfaces": [
           {
@@ -252,7 +251,6 @@
             "disablePasswordAuthentication": true
             }
           }
-        },
         "networkProfile": {
           "networkInterfaces": [
           {
