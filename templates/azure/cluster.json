@@ -279,11 +279,11 @@
                 }
           }
           ]
-      },
-      "dependsOn": [
+      }
+    },
+    "dependsOn": [
         "nicLoop"
       ]
-    }
     }
   ]
 }
