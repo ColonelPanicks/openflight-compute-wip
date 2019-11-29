@@ -81,8 +81,8 @@ When `AUTH` is set to `password` the second argument to the build script will be
 
 ### Additional Notes
 
-- If the variable `SSH_PUB_KEY` is present in a config file then it will be used. This value *will be overwritten if an SSH key is passed on the command line*.
-- If the variable `PASSWORD` is present in a config file then it will be used. This value *will be overwritten if a password is passed on the command line*.
+- If the variable `SSH_PUB_KEY` is present in a config file then it will be used. *This value will be overwritten if an SSH key is passed on the command line*.
+- If the variable `PASSWORD` is present in a config file then it will be used. *This value will be overwritten if a password is passed on the command line*.
 
 ## Versioning
 
