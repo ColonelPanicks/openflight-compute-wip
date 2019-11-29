@@ -151,8 +151,7 @@ function deploy_azure() {
     az group create --name "$CLUSTERNAME" --location "$AZURE_LOCATION"
     az group deployment create --name "$CLUSTERNAME" --resource-group "$CLUSTERNAME" \
         --template-file $DIR/templates/azure/cluster.json \
-        --parameters sshPublicKey="$SSH_PUB_KEY" \
-        sourceimage="$AZURE_SOURCEIMAGE" \
+        --parameters sourceimage="$AZURE_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
         customdata="$CUSTOMDATA"
@@ -200,8 +199,7 @@ function deploy_aws() {
     # Deploy resources
     aws cloudformation deploy --template-file $DIR/templates/aws/cluster.yaml --stack-name $CLUSTERNAME \
         --region "$AWS_LOCATION" \
-        --parameter-overrides sshPublicKey="$SSH_PUB_KEY" \
-        sourceimage="$AWS_SOURCEIMAGE" \
+        --parameter-overrides sourceimage="$AWS_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
         customdata="$CUSTOMDATA"
