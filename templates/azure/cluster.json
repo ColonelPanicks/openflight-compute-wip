@@ -167,7 +167,6 @@
                 }
           }
           ]
-        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', 'flightcloudclustergateway1network1interface')]"
@@ -263,7 +262,6 @@
                 }
           }
           ]
-        }
       },
       "dependsOn": [
         "nicLoop"
