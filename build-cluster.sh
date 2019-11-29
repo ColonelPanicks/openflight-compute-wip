@@ -98,6 +98,8 @@ $(if [[ "$AUTH" == "key" ]] ; then
 echo "  - echo "$SSH_PUB_KEY" >> /home/flight/.ssh/authorized_keys"
 else
 echo "  - echo "$PASSWORD" | passwd --stdin flight"
+echo "  - sed 's/[\^|#]?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config"
+echo "  - systemctl restart sshd"
 fi)
   - firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd --add-interface eth0 --zone trusted --permanent && firewall-cmd --reload
   - timedatectl set-timezone Europe/London
