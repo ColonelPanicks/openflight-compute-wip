@@ -156,7 +156,7 @@
           "linuxConfiguration": {
             "disablePasswordAuthentication": true
             }
-          }
+          },
         "networkProfile": {
           "networkInterfaces": [
           {
@@ -166,6 +166,7 @@
                 }
           }
           ]
+        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', 'flightcloudclustergateway1network1interface')]"
@@ -250,7 +251,7 @@
           "linuxConfiguration": {
             "disablePasswordAuthentication": true
             }
-          }
+          },
         "networkProfile": {
           "networkInterfaces": [
           {
@@ -265,8 +266,6 @@
         "nicLoop"
       ]
     }
+    }
   ]
 }
-
-
-
