@@ -60,7 +60,7 @@ function check_key() {
         exit 1
     fi
 
-    if echo "$SSH_PUB_KEY" | ssh-keygen -lf /dev/stdin > /dev/null 2>&1 ; then
+    if ! echo "$SSH_PUB_KEY" | ssh-keygen -lf /dev/stdin > /dev/null 2>&1 ; then
         echo "Invalid SSH key"
         echo "  The SSH key provided was not successfully validated by ssh-keygen"
         echo "  It is most likely that a character or symbol is missing from the key"
