@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-      "sshPublicKey": {
-          "type": "string",
-          "metadata": {
-              "description": "SSH public key for flight user"
-          }
-      },
       "sourceimage": {
           "type": "string",
           "metadata": {
@@ -160,12 +154,7 @@
           "adminUsername": "flight",
           "customdata": "[parameters('customdata')]",
           "linuxConfiguration": {
-            "disablePasswordAuthentication": true,
-            "ssh": {
-            "publicKeys": [{
-              "path": "[concat ('/home/flight', '/.ssh/authorized_keys')]",
-              "keyData": "[parameters('sshPublicKey')]"
-              }]
+            "disablePasswordAuthentication": true
             }
           }
         },
@@ -261,12 +250,7 @@
           "adminUsername": "flight",
           "customdata": "[parameters('customdata')]",
           "linuxConfiguration": {
-            "disablePasswordAuthentication": true,
-            "ssh": {
-            "publicKeys": [{
-              "path": "[concat ('/home/flight', '/.ssh/authorized_keys')]",
-              "keyData": "[parameters('sshPublicKey')]"
-              }]
+            "disablePasswordAuthentication": true
             }
           }
         },
