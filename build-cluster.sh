@@ -51,20 +51,6 @@ elif [ "$COMPUTENODES" -lt 2 -o "$COMPUTENODES" -gt 8 ] ; then
     exit 1
 fi
 
-case $AUTH in 
-    "key")
-        check_key
-    ;;
-    "password")
-        check_password
-    ;;
-    *)
-        echo "Unrecognised auth type ($AUTH)"
-        echo "Set to either 'key' or 'password'"
-        exit 1
-    ;;
-esac
-
 ###############
 # Log Details #
 ###############
@@ -238,6 +224,20 @@ function run_ansible() {
 #################
 # Run Functions #
 #################
+
+case $AUTH in 
+    "key")
+        check_key
+    ;;
+    "password")
+        check_password
+    ;;
+    *)
+        echo "Unrecognised auth type ($AUTH)"
+        echo "Set to either 'key' or 'password'"
+        exit 1
+    ;;
+esac
 
 generate_custom_data
 
