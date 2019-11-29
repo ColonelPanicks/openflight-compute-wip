@@ -155,10 +155,17 @@
           "adminPassword": "OpenFlightPlaceholderPassword",
           "customdata": "[parameters('customdata')]",
           "linuxConfiguration": {
-            "disablePasswordAuthentication": true
-
+            "disablePasswordAuthentication": true,
+            "ssh": {
+                "publicKeys": [
+                    {
+                        "path": "/tmp/placeholder-ssh",
+                        "keyData": "this key created to prevent azure template from erroring"
+                    }
+                ]
             }
-          },
+          }
+        },
         "networkProfile": {
           "networkInterfaces": [
           {
@@ -252,9 +259,17 @@
           "adminPassword": "OpenFlightPlaceholderPassword",
           "customdata": "[parameters('customdata')]",
           "linuxConfiguration": {
-            "disablePasswordAuthentication": true
+            "disablePasswordAuthentication": true,
+            "ssh": {
+                "publicKeys": [
+                    {
+                        "path": "/tmp/placeholder-ssh",
+                        "keyData": "this key created to prevent azure template from erroring"
+                    }
+                ]
             }
-          },
+          }
+        },
         "networkProfile": {
           "networkInterfaces": [
           {
