@@ -27,6 +27,7 @@ fi
 
 CLUSTERNAMEARG="$1"
 SSH_PUB_KEY="${2:-$SSH_PUB_KEY}"
+PASSWORD="${2:-$PASSWORD}"
 
 LOG="$DIR/log/deploy.log"
 
@@ -45,22 +46,24 @@ if [ -z "${CLUSTERNAME}" ] ; then
     echo "Provide cluster name"
     echo "  build-cluster.sh CLUSTERNAME SSH_PUB_KEY"
     exit 1
-elif [ -z "${SSH_PUB_KEY}" ] ; then
-    echo "Provide ssh public key"
-    echo "  build-cluster.sh CLUSTERNAME SSH_PUB_KEY"
-    exit 1
 elif [ "$COMPUTENODES" -lt 2 -o "$COMPUTENODES" -gt 8 ] ; then
     echo "Number of nodes must be between 2 and 8"
     exit 1
 fi
 
-# Don't allow SSH_PUB_KEY to be set to the controller's pub key (as this is added via setup.sh on the deployed nodes)
-if [[ *"$(cat /root/.ssh/id_rsa.pub)"* == *"$SSH_PUB_KEY"* ]] ; then
-    echo "Provide ssh public key that is *not* this controller's public key."
-    echo "This controller's key is automatically added to the compute nodes at deployment"
-    echo "to allow ansible setup to run on nodes"
-    exit 1
-fi
+case $AUTH in 
+    "key")
+        check_key
+    ;;
+    "password")
+        check_password
+    ;;
+    *)
+        echo "Unrecognised auth type ($AUTH)"
+        echo "Set to either 'key' or 'password'"
+        exit 1
+    ;;
+esac
 
 ###############
 # Log Details #
@@ -71,6 +74,39 @@ echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | $
 # Functions #
 #############
 
+function check_key() { 
+    if [ -z "${SSH_PUB_KEY}" ] ; then
+        echo "Provide ssh public key"
+        echo "  build-cluster.sh CLUSTERNAME SSH_PUB_KEY"
+        exit 1
+    fi
+
+    if echo "$SSH_PUB_KEY" | ssh-keygen -lf /dev/stdin > /dev/null 2>&1 ; then
+        echo "Invalid SSH key"
+        echo "  The SSH key provided was not successfully validated by ssh-keygen"
+        echo "  It is most likely that a character or symbol is missing from the key"
+        echo "  Verify the key is correct and try running this script again"
+        exit 1
+    fi
+
+    # Don't allow SSH_PUB_KEY to be set to the controller's pub key (as this is added via setup.sh on the deployed nodes)
+    if [[ *"$(cat /root/.ssh/id_rsa.pub)"* == *"$SSH_PUB_KEY"* ]] ; then
+        echo "Provide ssh public key that is *not* this controller's public key."
+        echo "This controller's key is automatically added to the compute nodes at deployment"
+        echo "to allow ansible setup to run on nodes"
+        exit 1
+    fi
+
+}
+
+function check_password() {
+    if [ -z "${PASSWORD}" ] ; then
+        echo "Provide ssh password"
+        echo "  build-cluster.sh CLUSTERNAME PASSWORD"
+        exit 1
+    fi
+}
+
 function generate_custom_data() {
     DATA=$(cat << EOF
 #cloud-config
@@ -79,7 +115,11 @@ system_info:
     name: flight
 runcmd:
   - echo "$(cat /root/.ssh/id_rsa.pub)" >> /root/.ssh/authorized_keys
-  - echo "$SSH_PUB_KEY" >> /home/flight/.ssh/authorized_keys
+$(if [[ "$AUTH" == "key" ]] ; then
+echo "  - echo "$SSH_PUB_KEY" >> /home/flight/.ssh/authorized_keys"
+else
+echo "  - echo "$PASSWORD" | passwd --stdin flight"
+fi)
   - firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd --add-interface eth0 --zone trusted --permanent && firewall-cmd --reload
   - timedatectl set-timezone Europe/London
 EOF

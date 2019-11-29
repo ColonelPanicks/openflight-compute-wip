@@ -73,9 +73,16 @@ In some circumstances there are common deployment configurations that make const
     CONFIG=mynewdeploymentconfig bash build-cluster.sh CLUSTERNAME 'SSH PUBLIC KEY'
     ```
 
+### Cluster Using Password Instead of SSH Key
+
+While less secure, this method of authorising access to a cluster may be required from time to time. In order to switch from key authorisation to password, set the `AUTH` variable to `password` in the desired config file.
+
+When `AUTH` is set to `password` the second argument to the build script will be used as the password instead of being used as an SSH public key.
+
 ### Additional Notes
 
 - If the variable `SSH_PUB_KEY` is present in a config file then it will be used. This value *will be overwritten if an SSH key is passed on the command line*.
+- If the variable `PASSWORD` is present in a config file then it will be used. This value *will be overwritten if a password is passed on the command line*.
 
 ## Versioning
 

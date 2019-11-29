@@ -9,11 +9,28 @@ PLATFORM="azure"
 # A value between 2 and 8
 COMPUTENODES="2"
 
+
+#
+# Authorisation
+#
+
+# Either 'key' or 'password'
+AUTH="key"
+
 # Public SSH key for user access
 ## Note: This will be overwritten if an SSH key is given
 ## on the CLI
 #SSH_PUB_KEY=""
 
+# Password for user access
+## Note: This will only be used if the AUTH var is set to
+## password
+#PASSWORD=""
+
+
+#
+# Flight Env Bootstrap
+#
 
 # If true then the ansible-playbook will run additional
 # configuration steps for the flight environment to ensure
