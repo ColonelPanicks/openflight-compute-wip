@@ -34,8 +34,6 @@ LOG="$DIR/log/deploy.log"
 SEED=$(head /dev/urandom | tr -dc a-z0-9 | head -c 6 ; echo '')
 CLUSTERNAME="$CLUSTERNAMEARG-$SEED"
 
-# The host IP which is sharing setup.sh script at http://IP/deployment/setup.sh
-CONTROLLERIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
 GATEWAYIP="Unknown"
 
 #################
@@ -50,11 +48,6 @@ elif [ "$COMPUTENODES" -lt 2 -o "$COMPUTENODES" -gt 8 ] ; then
     echo "Number of nodes must be between 2 and 8"
     exit 1
 fi
-
-###############
-# Log Details #
-###############
-echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | $SSH_PUB_KEY" |tee -a $LOG
 
 #############
 # Functions #
@@ -238,6 +231,8 @@ case $AUTH in
         exit 1
     ;;
 esac
+
+echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | Auth Method: $AUTH" |tee -a $LOG
 
 generate_custom_data
 
