@@ -152,9 +152,11 @@
         "osProfile": {
           "computerName": "[concat('gateway1.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
+          "adminPassword": "OpenFlightPlaceholderPassword",
           "customdata": "[parameters('customdata')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true
+
             }
           },
         "networkProfile": {
@@ -247,6 +249,7 @@
           "osProfile": {
           "computerName": "[concat('node0', copyindex(1), '.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
+          "adminPassword": "OpenFlightPlaceholderPassword",
           "customdata": "[parameters('customdata')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true
