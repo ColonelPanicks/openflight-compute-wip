@@ -55,7 +55,7 @@ function destroy_cluster_azure {
 
 function destroy_cluster_aws {
     cluster=$1
-    aws cloudformation delete-stack --stack-name $cluster --region $AWS_REGION
+    aws cloudformation delete-stack --stack-name $cluster --region $AWS_LOCATION
 }
 
 #################
