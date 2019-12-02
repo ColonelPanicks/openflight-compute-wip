@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-      "sshPublicKey": {
-          "type": "string",
-          "metadata": {
-              "description": "SSH public key for flight user"
-          }
-      },
       "sourceimage": {
           "type": "string",
           "metadata": {
@@ -155,17 +149,20 @@
             "id": "[parameters('sourceimage')]"
           }
         },
-            "osProfile": {
+        "osProfile": {
           "computerName": "[concat('gateway1.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
+          "adminPassword": "OpenFlightPlaceholderPassword",
           "customdata": "[parameters('customdata')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
-            "publicKeys": [{
-              "path": "[concat ('/home/flight', '/.ssh/authorized_keys')]",
-              "keyData": "[parameters('sshPublicKey')]"
-              }]
+                "publicKeys": [
+                    {
+                        "path": "/home/flight/.ssh/authorized_keys",
+                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/0R5EvmSrySy2I+8Cx6eOX7cVuYFXx5D0O1x0+OmAZ0Qaj9d7E0Nj4ZcWxdCT03uFl1Ka4tInDlQmMyy0V1/AftpHxBEnB17Pk/lJnDW1YstmAqD0GlFa1CrxUdtHd+jB3LJmdoHsV6fRGpMOgFd+u/4Wces7KAqYFmL5uPG1UTCMgokQ2qboQgEVspXotMvni1iil3kEjyH/eW64Laxmn2Vxls9feZ1o95mPQhJPJcN7MMo1h+jkxyat3bawtpqyV7fXYU0+BO2JHpu/VIEDHtxhlk7RhI0U06XbJu6ZCCUrEX8idIhw4hueQpKwVYplTXssa9JqNlcjouqLj5kd"
+                    }
+                ]
             }
           }
         },
@@ -259,14 +256,17 @@
           "osProfile": {
           "computerName": "[concat('node0', copyindex(1), '.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
+          "adminPassword": "OpenFlightPlaceholderPassword",
           "customdata": "[parameters('customdata')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
-            "publicKeys": [{
-              "path": "[concat ('/home/flight', '/.ssh/authorized_keys')]",
-              "keyData": "[parameters('sshPublicKey')]"
-              }]
+                "publicKeys": [
+                    {
+                        "path": "/home/flight/.ssh/authorized_keys",
+                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/0R5EvmSrySy2I+8Cx6eOX7cVuYFXx5D0O1x0+OmAZ0Qaj9d7E0Nj4ZcWxdCT03uFl1Ka4tInDlQmMyy0V1/AftpHxBEnB17Pk/lJnDW1YstmAqD0GlFa1CrxUdtHd+jB3LJmdoHsV6fRGpMOgFd+u/4Wces7KAqYFmL5uPG1UTCMgokQ2qboQgEVspXotMvni1iil3kEjyH/eW64Laxmn2Vxls9feZ1o95mPQhJPJcN7MMo1h+jkxyat3bawtpqyV7fXYU0+BO2JHpu/VIEDHtxhlk7RhI0U06XbJu6ZCCUrEX8idIhw4hueQpKwVYplTXssa9JqNlcjouqLj5kd"
+                    }
+                ]
             }
           }
         },
@@ -279,14 +279,11 @@
                 }
           }
           ]
-        }
-      },
-      "dependsOn": [
+      }
+    },
+    "dependsOn": [
         "nicLoop"
       ]
     }
   ]
 }
-
-
-

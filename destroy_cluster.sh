@@ -8,7 +8,18 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Source variables
-source $DIR/config.sh
+if [ -z "${CONFIG}" ] ; then
+    source $DIR/configs/default.sh
+else
+    config_path=$DIR/configs/$CONFIG.sh
+    if [ -f $config_path ] ; then
+        source $config_path
+    else
+        echo "Error loading $CONFIG"
+        echo "Could not load $config_path"
+        exit 1
+    fi
+fi
 
 CLUSTERS="$(ls /opt/flight/clusters/)"
 CLUSTERNAME="$1"
@@ -26,6 +37,9 @@ function destroy_cluster {
         "azure")
             destroy_cluster_azure $cluster
             ;;
+        "aws")
+            destroy_cluster_aws $cluster
+            ;;
         *)
             echo "Unrecognised platform, check config.sh"
             exit 1
@@ -37,6 +51,11 @@ function destroy_cluster {
 function destroy_cluster_azure {
     cluster=$1
     az group delete --name $cluster
+}
+
+function destroy_cluster_aws {
+    cluster=$1
+    aws cloudformation delete-stack --stack-name $cluster --region $AWS_REGION
 }
 
 #################

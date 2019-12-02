@@ -2,7 +2,7 @@
 
 This repository contains scripts for the R&D setup of OpenFlight Compute.
 
-## How to Use It
+## Configure Environment
 
 Currently, this is being developed and tested on Azure.
 
@@ -23,18 +23,66 @@ Currently, this is being developed and tested on Azure.
     bash setup.sh
     ```
 
-5. Update the config variables to reflect cloud configuration
+5. Update the config variables to reflect desired cloud configuration
 
    ```
-   vim config.sh
+   vim configs/default.sh
    ```
 
-5. Create a cluster
+## Create a Cluster
+
+### Cluster Using Default Configuration
+
+- Navigate to builder directory
 
     ```
     cd openflight-compute-cluster-builder
+    ```
+
+- Create a cluster, providing the name and public SSH key to use
+
+    ```
     bash build-cluster.sh CLUSTERNAME 'SSH PUBLIC KEY'
     ```
+
+### Cluster Using Alternative Configuration
+
+In some circumstances there are common deployment configurations that make constant management of one config file time-consuming and inflexible. For this reason, multiple configuration files can exist within `configs/` to allow for storage of these deployment details.
+
+- Navigate to builder directory
+
+    ```
+    cd openflight-compute-cluster-builder
+    ```
+
+- Create a new config file
+
+    ```
+    cp configs/default.sh configs/mynewdeploymentconfig.sh
+    ```
+
+- Update variables and configuration to meet your requirements
+
+   ```
+   vim configs/mynewdeploymentconfig.sh
+   ```
+
+- Create a cluster, providing the name and public SSH key to use
+
+    ```
+    CONFIG=mynewdeploymentconfig bash build-cluster.sh CLUSTERNAME 'SSH PUBLIC KEY'
+    ```
+
+### Cluster Using Password Instead of SSH Key
+
+While less secure, this method of authorising access to a cluster may be required from time to time. In order to switch from key authorisation to password, set the `AUTH` variable to `password` in the desired config file.
+
+When `AUTH` is set to `password` the second argument to the build script will be used as the password instead of being used as an SSH public key.
+
+### Additional Notes
+
+- If the variable `SSH_PUB_KEY` is present in a config file then it will be used. *This value will be overwritten if an SSH key is passed on the command line*.
+- If the variable `PASSWORD` is present in a config file then it will be used. *This value will be overwritten if a password is passed on the command line*.
 
 ## Versioning
 

@@ -12,18 +12,28 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Source variables
-source $DIR/config.sh
+if [ -z "${CONFIG}" ] ; then
+    source $DIR/configs/default.sh
+else
+    config_path=$DIR/configs/$CONFIG.sh
+    if [ -f $config_path ] ; then
+        source $config_path
+    else
+        echo "Error loading $CONFIG"
+        echo "Could not load $config_path"
+        exit 1
+    fi
+fi
 
 CLUSTERNAMEARG="$1"
-SSH_PUB_KEY="$2"
+SSH_PUB_KEY="${2:-$SSH_PUB_KEY}"
+PASSWORD="${2:-$PASSWORD}"
 
 LOG="$DIR/log/deploy.log"
 
 SEED=$(head /dev/urandom | tr -dc a-z0-9 | head -c 6 ; echo '')
 CLUSTERNAME="$CLUSTERNAMEARG-$SEED"
 
-# The host IP which is sharing setup.sh script at http://IP/deployment/setup.sh
-CONTROLLERIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
 GATEWAYIP="Unknown"
 
 #################
@@ -34,31 +44,47 @@ if [ -z "${CLUSTERNAME}" ] ; then
     echo "Provide cluster name"
     echo "  build-cluster.sh CLUSTERNAME SSH_PUB_KEY"
     exit 1
-elif [ -z "${SSH_PUB_KEY}" ] ; then
-    echo "Provide ssh public key"
-    echo "  build-cluster.sh CLUSTERNAME SSH_PUB_KEY"
-    exit 1
 elif [ "$COMPUTENODES" -lt 2 -o "$COMPUTENODES" -gt 8 ] ; then
     echo "Number of nodes must be between 2 and 8"
     exit 1
 fi
 
-# Don't allow SSH_PUB_KEY to be set to the controller's pub key (as this is added via setup.sh on the deployed nodes)
-if [[ *"$(cat /root/.ssh/id_rsa.pub)"* == *"$SSH_PUB_KEY"* ]] ; then
-    echo "Provide ssh public key that is *not* this controller's public key."
-    echo "This controller's key is automatically added to the compute nodes at deployment"
-    echo "to allow ansible setup to run on nodes"
-    exit 1
-fi
-
-###############
-# Log Details #
-###############
-echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | $SSH_PUB_KEY" |tee -a $LOG
-
 #############
 # Functions #
 #############
+
+function check_key() { 
+    if [ -z "${SSH_PUB_KEY}" ] ; then
+        echo "Provide ssh public key"
+        echo "  build-cluster.sh CLUSTERNAME SSH_PUB_KEY"
+        exit 1
+    fi
+
+    if ! echo "$SSH_PUB_KEY" | ssh-keygen -lf /dev/stdin > /dev/null 2>&1 ; then
+        echo "Invalid SSH key"
+        echo "  The SSH key provided was not successfully validated by ssh-keygen"
+        echo "  It is most likely that a character or symbol is missing from the key"
+        echo "  Verify the key is correct and try running this script again"
+        exit 1
+    fi
+
+    # Don't allow SSH_PUB_KEY to be set to the controller's pub key (as this is added via setup.sh on the deployed nodes)
+    if [[ *"$(cat /root/.ssh/id_rsa.pub)"* == *"$SSH_PUB_KEY"* ]] ; then
+        echo "Provide ssh public key that is *not* this controller's public key."
+        echo "This controller's key is automatically added to the compute nodes at deployment"
+        echo "to allow ansible setup to run on nodes"
+        exit 1
+    fi
+
+}
+
+function check_password() {
+    if [ -z "${PASSWORD}" ] ; then
+        echo "Provide ssh password"
+        echo "  build-cluster.sh CLUSTERNAME PASSWORD"
+        exit 1
+    fi
+}
 
 function generate_custom_data() {
     DATA=$(cat << EOF
@@ -68,7 +94,13 @@ system_info:
     name: flight
 runcmd:
   - echo "$(cat /root/.ssh/id_rsa.pub)" >> /root/.ssh/authorized_keys
-  - echo "$SSH_PUB_KEY" >> /home/flight/.ssh/authorized_keys
+$(if [[ "$AUTH" == "key" ]] ; then
+echo "  - echo "$SSH_PUB_KEY" >> /home/flight/.ssh/authorized_keys"
+else
+echo "  - echo "$PASSWORD" | passwd --stdin flight"
+echo "  - sed -i 's/^PasswordAuthentication .*/PasswordAuthentication yes/g' /etc/ssh/sshd_config"
+echo "  - systemctl restart sshd"
+fi)
   - firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd --add-interface eth0 --zone trusted --permanent && firewall-cmd --reload
   - timedatectl set-timezone Europe/London
 EOF
@@ -100,8 +132,7 @@ function deploy_azure() {
     az group create --name "$CLUSTERNAME" --location "$AZURE_LOCATION"
     az group deployment create --name "$CLUSTERNAME" --resource-group "$CLUSTERNAME" \
         --template-file $DIR/templates/azure/cluster.json \
-        --parameters sshPublicKey="$SSH_PUB_KEY" \
-        sourceimage="$AZURE_SOURCEIMAGE" \
+        --parameters sourceimage="$AZURE_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
         customdata="$CUSTOMDATA"
@@ -149,8 +180,7 @@ function deploy_aws() {
     # Deploy resources
     aws cloudformation deploy --template-file $DIR/templates/aws/cluster.yaml --stack-name $CLUSTERNAME \
         --region "$AWS_LOCATION" \
-        --parameter-overrides sshPublicKey="$SSH_PUB_KEY" \
-        sourceimage="$AWS_SOURCEIMAGE" \
+        --parameter-overrides sourceimage="$AWS_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
         customdata="$CUSTOMDATA"
@@ -189,6 +219,22 @@ function run_ansible() {
 #################
 # Run Functions #
 #################
+
+case $AUTH in 
+    "key")
+        check_key
+    ;;
+    "password")
+        check_password
+    ;;
+    *)
+        echo "Unrecognised auth type ($AUTH)"
+        echo "Set to either 'key' or 'password'"
+        exit 1
+    ;;
+esac
+
+echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Deploy | $PLATFORM | Auth Method: $AUTH" |tee -a $LOG
 
 generate_custom_data
 
