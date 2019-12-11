@@ -29,8 +29,14 @@ AUTH="key"
 
 
 #
-# Flight Env Bootstrap
+# Flight Env 
 #
+
+# If true then the ansible-playbook will enable the 
+# development repositories for OpenFlight tools, 
+# installing the latest (and potentially volatile)
+# versions of the user suite tools
+FLIGHTENVDEV=false
 
 # If true then the ansible-playbook will run additional
 # configuration steps for the flight environment to ensure

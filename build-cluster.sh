@@ -206,14 +206,20 @@ EOF
 }
 
 function run_ansible() {
+    # Determine if dev repos for openflight to be used
+    if [ "$FLIGHTENVDEV" = "true" ] ; then
+        flightenv_dev_var="flightenv_dev=true"
+    fi
+
     # Determine if extra flight env stuff to be run
     if [ "$FLIGHTENVPREPARE" = "true" ] ; then
-        extra_flightenv_var="flightenv_bootstrap=true"
+        flightenv_bootstrap_var="flightenv_bootstrap=true"
     fi
+
     # Run ansible playbook
     cd /root/openflight-ansible-playbook
     export ANSIBLE_HOST_KEY_CHECKING=false
-    ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=node[01-0$COMPUTENODES] $extra_flightenv_var" openflight.yml
+    ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=node[01-0$COMPUTENODES] $flightenv_dev_var $flightenv_bootstrap_var" openflight.yml
 }
 
 #################
