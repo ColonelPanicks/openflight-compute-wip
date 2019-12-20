@@ -16,6 +16,14 @@ Parameters:
     MinValue: 2
     MaxValue: 8
     Description: 'Number of compute nodes to include in cluster'
+  gatewayinstancetype:
+    Type: String
+    Default: 't2.small'
+    Description: 'Instance type to be used for the gateway node'
+  computeinstancetype:
+    Type: String
+    Default: 't2.small'
+    Description: 'Instance type to be used for the compute nodes'
 Conditions:
   CreateNode03: !Or [ !Equals [ !Ref computeNodesCount, 3 ], !Equals [ !Ref computeNodesCount, 4 ], !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
   CreateNode04: !Or [ !Equals [ !Ref computeNodesCount, 4 ], !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
@@ -287,7 +295,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !Ref sourceimage
-      InstanceType: t2.small
+      InstanceType: !Ref gatewayinstancetype
       Monitoring: true
       NetworkInterfaces:
         -
@@ -321,7 +329,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !Ref sourceimage
-      InstanceType: t2.small
+      InstanceType: !Ref computeinstancetype
       Monitoring: true
       NetworkInterfaces:
         -
@@ -355,7 +363,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !Ref sourceimage
-      InstanceType: t2.small
+      InstanceType: !Ref computeinstancetype
       Monitoring: true
       NetworkInterfaces:
         -
@@ -391,7 +399,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !Ref sourceimage
-      InstanceType: t2.small
+      InstanceType: !Ref computeinstancetype
       Monitoring: true
       NetworkInterfaces:
         -
@@ -429,7 +437,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !Ref sourceimage
-      InstanceType: t2.small
+      InstanceType: !Ref computeinstancetype
       Monitoring: true
       NetworkInterfaces:
         -
@@ -467,7 +475,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !Ref sourceimage
-      InstanceType: t2.small
+      InstanceType: !Ref computeinstancetype
       Monitoring: true
       NetworkInterfaces:
         -
@@ -505,7 +513,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !Ref sourceimage
-      InstanceType: t2.small
+      InstanceType: !Ref computeinstancetype
       Monitoring: true
       NetworkInterfaces:
         -
@@ -543,7 +551,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !Ref sourceimage
-      InstanceType: t2.small
+      InstanceType: !Ref computeinstancetype
       Monitoring: true
       NetworkInterfaces:
         -
@@ -581,7 +589,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !Ref sourceimage
-      InstanceType: t2.small
+      InstanceType: !Ref computeinstancetype
       Monitoring: true
       NetworkInterfaces:
         -

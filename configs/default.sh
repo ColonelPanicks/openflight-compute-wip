@@ -54,6 +54,11 @@ AZURE_SOURCEIMAGE=""
 # Example: "UK South"
 AZURE_LOCATION=""
 
+# Instance Types
+## Example: Standard_DS1_v2
+AZURE_GATEWAYINSTANCE="Standard_DS1_v2"
+AZURE_COMPUTEINSTANCE="Standard_DS1_v2"
+
 
 #
 # AWS Configuration
@@ -64,3 +69,9 @@ AWS_SOURCEIMAGE=""
 
 # Example: "eu-west-1"
 AWS_LOCATION=""
+
+# Instance Types
+## Example: t2.small
+AWS_GATEWAYINSTANCE="t2.small"
+AWS_COMPUTEINSTANCE="t2.small"
+
