@@ -22,12 +22,14 @@
       },
       "gatewayinstancetype": {
           "type": "string",
+          "defaultValue": "Standard_DS1_v2",
           "metadata": {
               "description": "Instance type to use for gateway node"
           }
       },
       "computeinstancetype": {
           "type": "string",
+          "defaultValue": "Standard_DS1_v2",
           "metadata": {
               "description": "Instance type to use for compute nodes"
           }
