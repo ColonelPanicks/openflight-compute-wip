@@ -20,6 +20,20 @@
               "description": "Cloud-init customdata for all systems encoded in base64"
           }
       },
+      "gatewayinstancetype": {
+          "type": "string",
+          "defaultValue": "Standard_DS1_v2",
+          "metadata": {
+              "description": "Instance type to use for gateway node"
+          }
+      },
+      "computeinstancetype": {
+          "type": "string",
+          "defaultValue": "Standard_DS1_v2",
+          "metadata": {
+              "description": "Instance type to use for compute nodes"
+          }
+      },
       "computeNodesCount": {
           "type": "int",
           "defaultValue": 2,
@@ -135,7 +149,7 @@
       "location": "[resourceGroup().location]",
       "properties": {
         "hardwareProfile": {
-              "vmSize": "Standard_DS1_v2"
+              "vmSize": "[parameters('gatewayinstancetype')]"
             },
         "storageProfile": {
           "osDisk": {
@@ -239,7 +253,7 @@
       },
       "properties": {
         "hardwareProfile": {
-              "vmSize": "Standard_DS1_v2"
+              "vmSize": "[parameters('computeinstancetype')]"
             },
         "storageProfile": {
           "osDisk": {

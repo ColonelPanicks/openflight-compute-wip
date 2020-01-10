@@ -135,6 +135,8 @@ function deploy_azure() {
         --parameters sourceimage="$AZURE_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
+        gatewayinstancetype="$AZURE_GATEWAYINSTANCE" \
+        computeinstancetype="$AZURE_COMPUTEINSTANCE" \
         customdata="$CUSTOMDATA"
 
     GATEWAYIP=$(az network public-ip show -g $CLUSTERNAME -n flightcloudclustergateway1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
@@ -183,6 +185,8 @@ function deploy_aws() {
         --parameter-overrides sourceimage="$AWS_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
+        gatewayinstancetype="$AWS_GATEWAYINSTANCE" \
+        computeinstancetype="$AWS_COMPUTEINSTANCE" \
         customdata="$CUSTOMDATA"
     aws cloudformation wait stack-create-complete --stack-name $CLUSTERNAME --region "$AWS_LOCATION"
 
