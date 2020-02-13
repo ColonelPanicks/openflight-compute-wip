@@ -113,7 +113,6 @@ There are 2 scripts to assist with this setup, they are:
 - `create-vnc-index.sh`
     - Creates a [token file](https://github.com/novnc/websockify/wiki/token-based-target-selection) for the websockify server
     - Creates a YAML with similar information to the token file for rendering the web index
-    - Creates a service file (if not present) to launch the websockify server
     - Calls a ruby script to generate the index.html file from the YAML file
 - `generate-index.rb` 
     - Utilises ERB to generate an index.html file for hosting VNC connections`
