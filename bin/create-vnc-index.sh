@@ -38,10 +38,18 @@ for cluster in $(ls /opt/flight/clusters) ; do
     if [ ! -z "$DESKTOPS" ] ; then
         echo "$CLUSTERNAME:" >> $DESKTOPFILE
         while IFS= read -r i ; do
-	    # Add to VNC file
-            TYPE=$(echo "$i" |awk '{print $2}')
+            # Add to VNC file
+            session=$(echo "$i" |awk '{print $2}')
+            case $session in 
+                "xterm"|"terminal")
+                    TYPE="console"
+                    ;;
+                *)
+                    TYPE="desktop"
+                    ;;
+            esac
             PORT=$(echo "$i" |awk '{print $6}')
-	    PASS=$(echo "$i" |awk '{print $8}')
+            PASS=$(echo "$i" |awk '{print $8}')
             echo "$CLUSTERNAME-$TYPE: $IP:$PORT" >> $TOKENFILE
             echo "  $TYPE:" >> $DESKTOPFILE
             echo "    port: $PORT" >> $DESKTOPFILE
