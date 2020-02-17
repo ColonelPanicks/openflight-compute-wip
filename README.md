@@ -27,7 +27,7 @@ Currently, this is being developed and tested on Azure.
 
     ```
     cd openflight-compute-cluster-builder
-    bash setup.sh
+    bash bin/setup.sh
     ```
 
 5. Update the config variables to reflect desired cloud configuration
@@ -49,7 +49,7 @@ Currently, this is being developed and tested on Azure.
 - Create a cluster, providing the name and public SSH key to use
 
     ```
-    bash build-cluster.sh CLUSTERNAME 'SSH PUBLIC KEY'
+    bash bin/build-cluster.sh CLUSTERNAME 'SSH PUBLIC KEY'
     ```
 
 ### Cluster Using Alternative Configuration
@@ -93,7 +93,7 @@ When `AUTH` is set to `password` the second argument to the build script will be
 
 ## Destroy Deployed Clusters
 
-The destroy cluster script works in a similar manner to the build cluster script. 
+The `bin/destroy-cluster.sh` script works in a similar manner to the build cluster script. 
 
 Destroying a cluster requires that the same config used to deploy the cluster be specified before the script.
 
@@ -103,18 +103,18 @@ The script will warn the user and safely exit if there are duplicate clusters ex
 
 It's easy for the deployed cluster list (each cluster has an individual file under `/opt/flight/clusters`) to get out of sync with what's actually deployed (due to clusters usually being destroyed via cloud GUIs and not with the script).
 
-The script `check-clusters.sh` iterates through all the clusters under `/opt/flight/clusters` and tests ssh-ing into the gateway. A gateway that doesn't respond or doesn't authenticate is presumed as a destroyed cluster/reallocated IP address.
+The script `bin/check-clusters.sh` iterates through all the clusters under `/opt/flight/clusters` and tests ssh-ing into the gateway. A gateway that doesn't respond or doesn't authenticate is presumed as a destroyed cluster/reallocated IP address.
 
 ## Generate Web-Based VNC Access
 
 The purpose of these scripts is to provide a central location for accessing VNC on multiple clusters (using NoVNC). This is beneficial for large bootcamp/OpenFlight demos where users bring their own laptops that could have issues with VNC software, terminal emulators and other unforeseen difficulties with connection.
 
 There are 2 scripts to assist with this setup, they are:
-- `create-vnc-index.sh`
+- `bin/create-vnc-index.sh`
     - Creates a [token file](https://github.com/novnc/websockify/wiki/token-based-target-selection) for the websockify server
     - Creates a YAML with similar information to the token file for rendering the web index
     - Calls a ruby script to generate the index.html file from the YAML file
-- `generate-index.rb` 
+- `bin/generate-index.rb` 
     - Utilises ERB to generate an index.html file for hosting VNC connections`
 
 ## Versioning

@@ -5,7 +5,7 @@
 #############
 
 # Get directory of script for locating templates and config
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. >/dev/null 2>&1 && pwd )"
 
 # Source variables
 if [ -z "${CONFIG}" ] ; then

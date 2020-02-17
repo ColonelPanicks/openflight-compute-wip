@@ -1,8 +1,10 @@
 #!/bin/bash
 
-TOKENFILE="${1:-/root/tokens.list}"
-YAMLFILE="${2:-./desktops.yaml}"
-INDEXFILE="${3:-./index.html}"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. >/dev/null 2>&1 && pwd )"
+
+export TOKENFILE="${1:-/root/tokens.list}"
+export DESKTOPFILE="${2:-$DIR/desktops.yaml}"
+export INDEXFILE="${3:-$DIR/index.html}"
 
 if ! rpm -qa |grep -q ruby ; then
     echo "Ruby is required for generating index.html file"
@@ -15,10 +17,10 @@ if [ -f $TOKENFILE ] ; then
     mv -f $TOKENFILE $tokenbup
 fi
 
-if [ -f $YAMLFILE ] ; then
-    yamlbup="$YAMLFILE-old"
-    echo "$YAMLFILE already exists, moving to $yamlbup"
-    mv -f $YAMLFILE $yamlbup
+if [ -f $DESKTOPFILE ] ; then
+    desktopbup="$DESKTOPFILE-old"
+    echo "$DESKTOPFILE already exists, moving to $desktopbup"
+    mv -f $DESKTOPFILE $desktopbup
 fi
 
 if [ -f $INDEXFILE ] ; then
@@ -34,24 +36,24 @@ for cluster in $(ls /opt/flight/clusters) ; do
     CLUSTERNAME=$(echo "$cluster" |sed 's/-.*//g')
     DESKTOPS=$(ssh $IP "su - flight /opt/flight/bin/flight desktop list" |grep -v '^Last login' |tac)
     if [ ! -z "$DESKTOPS" ] ; then
-        echo "$CLUSTERNAME:" >> $YAMLFILE
+        echo "$CLUSTERNAME:" >> $DESKTOPFILE
         while IFS= read -r i ; do
 	    # Add to VNC file
             TYPE=$(echo "$i" |awk '{print $2}')
             PORT=$(echo "$i" |awk '{print $6}')
 	    PASS=$(echo "$i" |awk '{print $8}')
             echo "$CLUSTERNAME-$TYPE: $IP:$PORT" >> $TOKENFILE
-            echo "  $TYPE:" >> $YAMLFILE
-            echo "    port: $PORT" >> $YAMLFILE
-            echo "    pass: $PASS" >> $YAMLFILE
+            echo "  $TYPE:" >> $DESKTOPFILE
+            echo "    port: $PORT" >> $DESKTOPFILE
+            echo "    pass: $PASS" >> $DESKTOPFILE
         done <<< "$DESKTOPS"
     fi
 done
 
-echo "The following files have been written:"
-echo "- $TOKENFILE: For websockify server"
-echo "- $YAMLFILE: For ruby script to create index.html of all the servers"
-echo "- $INDEXFILE: A rendered index.html for connecting to servers"
-
 # Generate index.html (using ruby, yay)
 ruby generate-index.rb
+
+echo "The following files have been written:"
+echo "- $TOKENFILE: For websockify server"
+echo "- $DESKTOPFILE: For ruby script to create index.html of all the servers"
+echo "- $INDEXFILE: A rendered index.html for connecting to servers"

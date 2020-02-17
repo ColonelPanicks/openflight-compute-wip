@@ -9,7 +9,7 @@
 #############
 
 # Get directory of script for locating templates and config
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. >/dev/null 2>&1 && pwd )"
 
 # Source variables
 if [ -z "${CONFIG}" ] ; then
@@ -42,7 +42,7 @@ GATEWAYIP="Unknown"
 
 if [ -z "${CLUSTERNAME}" ] ; then
     echo "Provide cluster name"
-    echo "  build-cluster.sh CLUSTERNAME SSH_PUB_KEY"
+    echo "  bin/build-cluster.sh CLUSTERNAME SSH_PUB_KEY"
     exit 1
 elif [ "$COMPUTENODES" -lt 2 -o "$COMPUTENODES" -gt 8 ] ; then
     echo "Number of nodes must be between 2 and 8"
@@ -56,7 +56,7 @@ fi
 function check_key() { 
     if [ -z "${SSH_PUB_KEY}" ] ; then
         echo "Provide ssh public key"
-        echo "  build-cluster.sh CLUSTERNAME SSH_PUB_KEY"
+        echo "  bin/build-cluster.sh CLUSTERNAME SSH_PUB_KEY"
         exit 1
     fi
 
@@ -81,7 +81,7 @@ function check_key() {
 function check_password() {
     if [ -z "${PASSWORD}" ] ; then
         echo "Provide ssh password"
-        echo "  build-cluster.sh CLUSTERNAME PASSWORD"
+        echo "  bin/build-cluster.sh CLUSTERNAME PASSWORD"
         exit 1
     fi
 }
