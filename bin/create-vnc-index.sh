@@ -59,7 +59,7 @@ for cluster in $(ls /opt/flight/clusters) ; do
 done
 
 # Generate index.html (using ruby, yay)
-ruby generate-index.rb
+ruby $DIR/bin/generate-index.rb
 
 echo "The following files have been written:"
 echo "- $TOKENFILE: For websockify server"
