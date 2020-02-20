@@ -226,7 +226,7 @@ function run_ansible() {
     fi
 
     # Run ansible playbook
-    cd /root/openflight-ansible-playbook
+    cd $DIR/../playbook
     export ANSIBLE_HOST_KEY_CHECKING=false
     ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=node[01-0$COMPUTENODES] $flightenv_dev_var $flightenv_bootstrap_var $flightenv_bootcamp_vnc_var" openflight.yml
 }
