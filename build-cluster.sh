@@ -220,10 +220,15 @@ function run_ansible() {
         flightenv_bootstrap_var="flightenv_bootstrap=true"
     fi
 
+    # Determine if bootcamp modules to be run
+    if [ "$FLIGHTENVBOOTCAMPVNC" = "true" ] ; then
+        flightenv_bootcamp_vnc_var="flightenv_bootcamp_vnc=true"
+    fi
+
     # Run ansible playbook
     cd /root/openflight-ansible-playbook
     export ANSIBLE_HOST_KEY_CHECKING=false
-    ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=node[01-0$COMPUTENODES] $flightenv_dev_var $flightenv_bootstrap_var" openflight.yml
+    ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=node[01-0$COMPUTENODES] $flightenv_dev_var $flightenv_bootstrap_var $flightenv_bootcamp_vnc_var" openflight.yml
 }
 
 #################

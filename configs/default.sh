@@ -44,6 +44,10 @@ FLIGHTENVDEV=false
 # are installed before users login
 FLIGHTENVPREPARE=false
 
+# If true then the ansible-playbook will run additional
+# customisation steps for various bootcamp 'modules'
+FLIGHTENVBOOTCAMPVNC=false # Launches an xterm on 5901 and gnome on 5902
+
 #
 # Azure Configuration
 #
