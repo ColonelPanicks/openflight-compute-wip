@@ -290,6 +290,7 @@ Resources:
 
   flightcloudclustergateway1:
     Type: AWS::EC2::Instance
+    DependsOn: flightcloudclustergateway1pubIPassociation
     Properties:
       AvailabilityZone: !Select
         - 0
@@ -328,6 +329,7 @@ Resources:
 
   flightcloudclusternode01:
     Type: AWS::EC2::Instance
+    DependsOn: flightcloudclusternode01pubIPassociation
     Properties:
       AvailabilityZone: !Select
         - 0
@@ -366,6 +368,7 @@ Resources:
 
   flightcloudclusternode02:
     Type: AWS::EC2::Instance
+    DependsOn: flightcloudclusternode02pubIPassociation
     Properties:
       AvailabilityZone: !Select
         - 0
@@ -405,6 +408,7 @@ Resources:
 
   flightcloudclusternode03:
     Type: AWS::EC2::Instance
+    DependsOn: flightcloudclusternode03pubIPassociation
     Condition: CreateNode03
     Properties:
       AvailabilityZone: !Select
@@ -447,6 +451,7 @@ Resources:
 
   flightcloudclusternode04:
     Type: AWS::EC2::Instance
+    DependsOn: flightcloudclusternode04pubIPassociation
     Condition: CreateNode04
     Properties:
       AvailabilityZone: !Select
@@ -489,6 +494,7 @@ Resources:
 
   flightcloudclusternode05:
     Type: AWS::EC2::Instance
+    DependsOn: flightcloudclusternode05pubIPassociation
     Condition: CreateNode05
     Properties:
       AvailabilityZone: !Select
@@ -531,6 +537,7 @@ Resources:
 
   flightcloudclusternode06:
     Type: AWS::EC2::Instance
+    DependsOn: flightcloudclusternode06pubIPassociation
     Condition: CreateNode06
     Properties:
       AvailabilityZone: !Select
@@ -573,6 +580,7 @@ Resources:
 
   flightcloudclusternode07:
     Type: AWS::EC2::Instance
+    DependsOn: flightcloudclusternode07pubIPassociation
     Condition: CreateNode07
     Properties:
       AvailabilityZone: !Select
@@ -615,6 +623,7 @@ Resources:
 
   flightcloudclusternode08:
     Type: AWS::EC2::Instance
+    DependsOn: flightcloudclusternode08pubIPassociation
     Condition: CreateNode08
     Properties:
       AvailabilityZone: !Select
