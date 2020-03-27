@@ -331,6 +331,12 @@ Resources:
     Type: AWS::EC2::Instance
     DependsOn: flightcloudclusternode01pubIPassociation
     Properties:
+      Tags:
+        -
+          Key: "Name"
+          Value: !Sub
+           - "${cn}_node01"
+           - { cn: !Ref clustername }
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -370,6 +376,12 @@ Resources:
     Type: AWS::EC2::Instance
     DependsOn: flightcloudclusternode02pubIPassociation
     Properties:
+      Tags:
+        -
+          Key: "Name"
+          Value: !Sub
+           - "${cn}_node02"
+           - { cn: !Ref clustername }
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -411,6 +423,12 @@ Resources:
     DependsOn: flightcloudclusternode03pubIPassociation
     Condition: CreateNode03
     Properties:
+      Tags:
+        -
+          Key: "Name"
+          Value: !Sub
+           - "${cn}_node03"
+           - { cn: !Ref clustername }
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -454,6 +472,12 @@ Resources:
     DependsOn: flightcloudclusternode04pubIPassociation
     Condition: CreateNode04
     Properties:
+      Tags:
+        -
+          Key: "Name"
+          Value: !Sub
+           - "${cn}_node04"
+           - { cn: !Ref clustername }
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -497,6 +521,12 @@ Resources:
     DependsOn: flightcloudclusternode05pubIPassociation
     Condition: CreateNode05
     Properties:
+      Tags:
+        -
+          Key: "Name"
+          Value: !Sub
+           - "${cn}_node05"
+           - { cn: !Ref clustername }
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -540,6 +570,12 @@ Resources:
     DependsOn: flightcloudclusternode06pubIPassociation
     Condition: CreateNode06
     Properties:
+      Tags:
+        -
+          Key: "Name"
+          Value: !Sub
+           - "${cn}_node06"
+           - { cn: !Ref clustername }
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -583,6 +619,12 @@ Resources:
     DependsOn: flightcloudclusternode07pubIPassociation
     Condition: CreateNode07
     Properties:
+      Tags:
+        -
+          Key: "Name"
+          Value: !Sub
+           - "${cn}_node07"
+           - { cn: !Ref clustername }
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -626,6 +668,12 @@ Resources:
     DependsOn: flightcloudclusternode08pubIPassociation
     Condition: CreateNode08
     Properties:
+      Tags:
+        -
+          Key: "Name"
+          Value: !Sub
+           - "${cn}_node08"
+           - { cn: !Ref clustername }
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
