@@ -292,6 +292,12 @@ Resources:
     Type: AWS::EC2::Instance
     DependsOn: flightcloudclustergateway1pubIPassociation
     Properties:
+      Tags:
+        -
+          Key: "Name"
+          Value: !Sub
+           - "${cn}_gateway1"
+           - { cn: !Ref clustername }
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
