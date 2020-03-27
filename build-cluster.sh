@@ -103,6 +103,7 @@ echo "  - systemctl restart sshd"
 fi)
   - firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd --add-interface eth0 --zone trusted --permanent && firewall-cmd --reload
   - timedatectl set-timezone Europe/London
+  - grep -q "$CLUSTERNAME" /etc/resolv.conf || sed -r 's/^search (.*?)( pri.$CLUSTERNAME.cluster.local|$)/search \1 pri.$CLUSTERNAME.cluster.local/' /etc/resolv.conf
 EOF
 )
     CUSTOMDATA=$(echo "$DATA" |base64 -w 0)
