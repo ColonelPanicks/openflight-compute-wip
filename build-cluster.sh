@@ -157,7 +157,7 @@ done)
 EOF
     
     # Customise nodes
-    run_ansible
+    run_customisation
 }
 
 function check_aws() {
@@ -208,7 +208,24 @@ done)
 EOF
 
     # Customise nodes
+    run_customisation
+}
+
+function run_customisation() {
+    set_hostnames
     run_ansible
+}
+
+function set_hostnames() {
+    NODES=$(grep -vE '^\[|^$' /opt/flight/clusters/$CLUSTERNAME)
+
+    # Loop through nodes and set hostname
+    while IFS= read -r node ; do
+        name=$(echo "$node" |awk '{print $1}')
+        ip=$(echo "$node" |awk '{print $2}' |sed 's/.*ansible_host=//g')
+
+        ssh $ip "hostnamectl set-hostname $name.pri.$CLUSTERNAMEARG.cluster.local"
+    done <<< "$(echo "$NODES")"
 }
 
 function run_ansible() {
