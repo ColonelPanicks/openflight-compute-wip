@@ -224,6 +224,10 @@ function set_hostnames() {
         name=$(echo "$node" |awk '{print $1}')
         ip=$(echo "$node" |awk '{print $2}' |sed 's/.*ansible_host=//g')
 
+        until ssh $ip exit ; do
+            echo "Waiting for $name to be reachable"
+            sleep 5
+        done
         ssh $ip "hostnamectl set-hostname $name.pri.$CLUSTERNAMEARG.cluster.local"
     done <<< "$(echo "$NODES")"
 }
