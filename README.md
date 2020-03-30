@@ -84,6 +84,16 @@ When `AUTH` is set to `password` the second argument to the build script will be
 - If the variable `SSH_PUB_KEY` is present in a config file then it will be used. *This value will be overwritten if an SSH key is passed on the command line*.
 - If the variable `PASSWORD` is present in a config file then it will be used. *This value will be overwritten if a password is passed on the command line*.
 
+## Cloud Init
+
+The `build-cluster.sh` script creates a cloud-init string that will be run on all the nodes, the cloud-init config:
+- Adds the build machine's SSH public key to all nodes (for passwordless remote access, required for running of ansible playbook)
+- Sets up configured SSH public key/password access (depending on config) 
+- Disables the firewall
+- Disabled NetworkManager
+- Sets the timezone to Europe/London
+- Ensures that the cluster domain name is part of the search zone in `/etc/resolv.conf`
+
 ## Versioning
 
 The version release tags align with the tags in the openflight-ansible-playbook tags.
