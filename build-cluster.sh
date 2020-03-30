@@ -104,7 +104,7 @@ fi)
   - systemctl disable firewalld && systemctl stop firewalld
   - systemctl disable NetworkManager && systemctl stop NetworkManager
   - timedatectl set-timezone Europe/London
-  - grep -q "$CLUSTERNAME" /etc/resolv.conf || sed -r 's/^search (.*?)( pri.$CLUSTERNAME.cluster.local|$)/search \1 pri.$CLUSTERNAME.cluster.local/' /etc/resolv.conf
+  - grep -q "$CLUSTERNAMEARG" /etc/resolv.conf || sed -r 's/^search (.*?)( pri.$CLUSTERNAMEARG.cluster.local|$)/search \1 pri.$CLUSTERNAMEARG.cluster.local/' /etc/resolv.conf
 EOF
 )
     CUSTOMDATA=$(echo "$DATA" |base64 -w 0)
