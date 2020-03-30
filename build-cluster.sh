@@ -224,7 +224,7 @@ function set_hostnames() {
         name=$(echo "$node" |awk '{print $1}')
         ip=$(echo "$node" |awk '{print $2}' |sed 's/.*ansible_host=//g')
 
-        until ssh $ip exit ; do
+        until ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ip exit 2>/dev/null ; do
             echo "Waiting for $name to be reachable"
             sleep 5
         done
