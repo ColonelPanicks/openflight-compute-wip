@@ -101,8 +101,10 @@ echo "  - echo "$PASSWORD" | passwd --stdin flight"
 echo "  - sed -i 's/^PasswordAuthentication .*/PasswordAuthentication yes/g' /etc/ssh/sshd_config"
 echo "  - systemctl restart sshd"
 fi)
-  - firewall-cmd --remove-interface eth0 --zone public --permanent && firewall-cmd --add-interface eth0 --zone trusted --permanent && firewall-cmd --reload
+  - systemctl disable firewalld && systemctl stop firewalld
+  - systemctl disable NetworkManager && systemctl stop NetworkManager
   - timedatectl set-timezone Europe/London
+  - grep -q "$CLUSTERNAMEARG" /etc/resolv.conf || sed -ri 's/^search (.*?)( pri.$CLUSTERNAMEARG.cluster.local|$)/search \1 pri.$CLUSTERNAMEARG.cluster.local/' /etc/resolv.conf
 EOF
 )
     CUSTOMDATA=$(echo "$DATA" |base64 -w 0)
@@ -155,7 +157,7 @@ done)
 EOF
     
     # Customise nodes
-    run_ansible
+    run_customisation
 }
 
 function check_aws() {
@@ -206,7 +208,27 @@ done)
 EOF
 
     # Customise nodes
+    run_customisation
+}
+
+function run_customisation() {
+    set_hostnames
     run_ansible
+}
+
+function set_hostnames() {
+    NODES=$(grep -vE '^\[|^$' /opt/flight/clusters/$CLUSTERNAME)
+
+    # Loop through nodes and set hostname
+    while IFS= read -r node ; do
+        name=$(echo "$node" |awk '{print $1}')
+        ip=$(echo "$node" |awk '{print $2}' |sed 's/.*ansible_host=//g')
+
+        until ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ip exit </dev/null 2>/dev/null ; do
+            sleep 5
+        done
+        ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ip "hostnamectl set-hostname $name.pri.$CLUSTERNAMEARG.cluster.local" </dev/null
+    done <<< "$(echo "$NODES")"
 }
 
 function run_ansible() {
