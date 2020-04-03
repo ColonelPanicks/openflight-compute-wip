@@ -102,7 +102,6 @@ echo "  - sed -i 's/^PasswordAuthentication .*/PasswordAuthentication yes/g' /et
 echo "  - systemctl restart sshd"
 fi)
   - systemctl disable firewalld && systemctl stop firewalld
-  - systemctl disable NetworkManager && systemctl stop NetworkManager
   - timedatectl set-timezone Europe/London
   - grep -q "$CLUSTERNAMEARG" /etc/resolv.conf || sed -ri 's/^search (.*?)( pri.$CLUSTERNAMEARG.cluster.local|$)/search \1 pri.$CLUSTERNAMEARG.cluster.local/' /etc/resolv.conf
 EOF
