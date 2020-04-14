@@ -223,10 +223,10 @@ function set_hostnames() {
         name=$(echo "$node" |awk '{print $1}')
         ip=$(echo "$node" |awk '{print $2}' |sed 's/.*ansible_host=//g')
 
-        until ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ip exit </dev/null 2>/dev/null ; do
+        until ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ip exit </dev/null 2>/dev/null ; do
             sleep 5
         done
-        ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ip "hostnamectl set-hostname $name.pri.$CLUSTERNAMEARG.cluster.local" </dev/null
+        ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ip "hostnamectl set-hostname $name.pri.$CLUSTERNAMEARG.cluster.local" </dev/null
     done <<< "$(echo "$NODES")"
 }
 
