@@ -18,11 +18,11 @@ Parameters:
     Description: 'Number of compute nodes to include in cluster'
   gatewayinstancetype:
     Type: String
-    Default: 't2.small'
+    Default: 't3.small'
     Description: 'Instance type to be used for the gateway node'
   computeinstancetype:
     Type: String
-    Default: 't2.small'
+    Default: 't3.small'
     Description: 'Instance type to be used for the compute nodes'
 Conditions:
   CreateNode03: !Or [ !Equals [ !Ref computeNodesCount, 3 ], !Equals [ !Ref computeNodesCount, 4 ], !Equals [ !Ref computeNodesCount, 5 ], !Equals [ !Ref computeNodesCount, 6 ], !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
