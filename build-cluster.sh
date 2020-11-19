@@ -247,7 +247,9 @@ function run_ansible() {
     # Run ansible playbook
     cd $ANSIBLE_PLAYBOOK_DIR
     export ANSIBLE_HOST_KEY_CHECKING=false
-    ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=node[01-0$COMPUTENODES] $flightenv_dev_var $flightenv_bootstrap_var" openflight.yml
+    ARGS="cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=node[01-0$COMPUTENODES] $flightenv_dev_var $flightenv_bootstrap_var"
+    echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Ansible | ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars \"$ARGS\" openflight.yml" |tee -a $LOG
+    ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "$ARGS" openflight.yml
 }
 
 #################
