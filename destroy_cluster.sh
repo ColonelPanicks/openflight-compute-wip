@@ -48,14 +48,36 @@ function destroy_cluster {
     rm -f /opt/flight/clusters/$cluster
 }
 
+function check_cluster_azure {
+    cluster=$1
+    if ! az group show --name $cluster &>/dev/null ; then
+        cluster_error
+    fi
+}
+
 function destroy_cluster_azure {
     cluster=$1
     az group delete --name $cluster
 }
 
+function check_cluster_aws {
+    cluster=$1
+    if ! aws cloudformation describe-stacks --stack-name $cluster --region $AWS_LOCATION &>/dev/null ; then
+        cluster_error
+    fi
+}
+
 function destroy_cluster_aws {
     cluster=$1
     aws cloudformation delete-stack --stack-name $cluster --region $AWS_LOCATION
+}
+
+function cluster_error {
+    echo "Cannot find $CLUSTERNAME in specified config."
+    echo "Perhaps the wrong config has been used or the cluster has been deleted outside of the builder?"
+    echo 
+    echo "Exiting without action"
+    exit 1
 }
 
 #################
