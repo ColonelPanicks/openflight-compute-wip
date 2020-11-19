@@ -35,9 +35,11 @@ function destroy_cluster {
     cluster=$1
     case $PLATFORM in
         "azure")
+            check_cluster_azure $cluster
             destroy_cluster_azure $cluster
             ;;
         "aws")
+            check_cluster_aws $cluster
             destroy_cluster_aws $cluster
             ;;
         *)
@@ -57,7 +59,7 @@ function check_cluster_azure {
 
 function destroy_cluster_azure {
     cluster=$1
-    az group delete --name $cluster
+    az group delete -y --name $cluster
 }
 
 function check_cluster_aws {
