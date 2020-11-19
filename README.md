@@ -29,6 +29,12 @@ Currently, this is being developed and tested on Azure.
    vim configs/default.sh
    ```
 
+6. Check/update the application settings
+
+   ```
+   vim settings.sh
+   ```
+
 ## Create a Cluster
 
 ### Cluster Using Default Configuration
