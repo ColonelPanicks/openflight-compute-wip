@@ -11,7 +11,10 @@
 # Get directory of script for locating templates and config
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-# Source variables
+# Source application variables
+source $DIR/settings.sh
+
+# Source cluster config variables
 if [ -z "${CONFIG}" ] ; then
     source $DIR/configs/default.sh
 else
@@ -132,7 +135,7 @@ function check_azure() {
 function deploy_azure() {
     az group create --name "$CLUSTERNAME" --location "$AZURE_LOCATION"
     az group deployment create --name "$CLUSTERNAME" --resource-group "$CLUSTERNAME" \
-        --template-file $DIR/templates/azure/cluster.json \
+        --template-file $DIR/$AZURE_TEMPLATE \
         --parameters sourceimage="$AZURE_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
@@ -181,7 +184,7 @@ function check_aws() {
 
 function deploy_aws() {
     # Deploy resources
-    aws cloudformation deploy --template-file $DIR/templates/aws/cluster.yaml --stack-name $CLUSTERNAME \
+    aws cloudformation deploy --template-file $DIR/$AWS_TEMPLATE --stack-name $CLUSTERNAME \
         --region "$AWS_LOCATION" \
         --parameter-overrides sourceimage="$AWS_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
@@ -242,9 +245,11 @@ function run_ansible() {
     fi
 
     # Run ansible playbook
-    cd /root/openflight-ansible-playbook
+    cd $ANSIBLE_PLAYBOOK_DIR
     export ANSIBLE_HOST_KEY_CHECKING=false
-    ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=node[01-0$COMPUTENODES] $flightenv_dev_var $flightenv_bootstrap_var" openflight.yml
+    ARGS="cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=node[01-0$COMPUTENODES] $flightenv_dev_var $flightenv_bootstrap_var"
+    echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Ansible | ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars \"$ARGS\" openflight.yml" |tee -a $LOG
+    ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "$ARGS" openflight.yml
 }
 
 #################
