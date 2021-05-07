@@ -38,22 +38,51 @@ Resources:
       CidrBlock: 10.10.0.0/16
       EnableDnsSupport: true
       EnableDnsHostnames: true
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclusterinternetgateway:
     Type: AWS::EC2::InternetGateway
     DependsOn: flightcloudclusternetwork
+    Properties:
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclusterinternetgatewayattachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       InternetGatewayId: !Ref flightcloudclusterinternetgateway
       VpcId: !Ref flightcloudclusternetwork
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclusterroutetable:
     Type: AWS::EC2::RouteTable
     DependsOn: flightcloudclusterinternetgatewayattachment
     Properties:
       VpcId: !Ref flightcloudclusternetwork
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclusternetwork1:
     Type: AWS::EC2::Subnet
@@ -63,12 +92,26 @@ Resources:
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclusternetwork1subnetroutetableassocation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref flightcloudclusternetwork1
       RouteTableId: !Ref flightcloudclusterroutetable
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclusterrouteinternetgateway:
     Type: AWS::EC2::Route
@@ -77,6 +120,13 @@ Resources:
       RouteTableId: !Ref flightcloudclusterroutetable
       DestinationCidrBlock: '0.0.0.0/0'
       GatewayId: !Ref flightcloudclusterinternetgateway
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclustersecuritygroup:
     Type: AWS::EC2::SecurityGroup
@@ -128,169 +178,246 @@ Resources:
           ToPort: 65535
           CidrIp: '0.0.0.0/0'
           Description: 'Allow outbound internet access'
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclusterprivatedns:
-      Type: AWS::Route53::HostedZone
-      DependsOn: flightcloudclusternetwork
-      Properties:
-        HostedZoneConfig:
-          Comment: "Private DNS for a flightcloudcluster"
-        Name: !Sub
-          - "pri.${cn}.cluster.local"
-          - { cn: !Ref clustername }
-        VPCs:
-        - VPCId: !Ref flightcloudclusternetwork
-          VPCRegion: !Ref 'AWS::Region'
+    Type: AWS::Route53::HostedZone
+    DependsOn: flightcloudclusternetwork
+    Properties:
+      HostedZoneConfig:
+        Comment: "Private DNS for a flightcloudcluster"
+      Name: !Sub
+        - "pri.${cn}.cluster.local"
+        - { cn: !Ref clustername }
+      VPCs:
+      - VPCId: !Ref flightcloudclusternetwork
+        VPCRegion: !Ref 'AWS::Region'
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   dnsgateway1:
-      Type: AWS::Route53::RecordSet
-      DependsOn: flightcloudclusterprivatedns
-      Properties:
-        HostedZoneName: !Sub
-          - "pri.${cn}.cluster.local."
-          - { cn: !Ref clustername }
-        Comment: Entry for gateway1
-        Name: !Sub
-          - "gateway1.pri.${cn}.cluster.local"
-          - { cn: !Ref clustername }
-        Type: A
-        TTL: '900'
-        ResourceRecords:
-        - !GetAtt flightcloudclustergateway1.PrivateIp
+    Type: AWS::Route53::RecordSet
+    DependsOn: flightcloudclusterprivatedns
+    Properties:
+      HostedZoneName: !Sub
+        - "pri.${cn}.cluster.local."
+        - { cn: !Ref clustername }
+      Comment: Entry for gateway1
+      Name: !Sub
+        - "gateway1.pri.${cn}.cluster.local"
+        - { cn: !Ref clustername }
+      Type: A
+      TTL: '900'
+      ResourceRecords:
+      - !GetAtt flightcloudclustergateway1.PrivateIp
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   dnsnode01:
-      Type: AWS::Route53::RecordSet
-      DependsOn: flightcloudclusterprivatedns
-      Properties:
-        HostedZoneName: !Sub
-          - "pri.${cn}.cluster.local."
-          - { cn: !Ref clustername }
-        Comment: Entry for node01
-        Name: !Sub
-          - "node01.pri.${cn}.cluster.local"
-          - { cn: !Ref clustername }
-        Type: A
-        TTL: '900'
-        ResourceRecords:
+    Type: AWS::Route53::RecordSet
+    DependsOn: flightcloudclusterprivatedns
+    Properties:
+      HostedZoneName: !Sub
+        - "pri.${cn}.cluster.local."
+        - { cn: !Ref clustername }
+      Comment: Entry for node01
+      Name: !Sub
+        - "node01.pri.${cn}.cluster.local"
+        - { cn: !Ref clustername }
+      Type: A
+      TTL: '900'
+      ResourceRecords:
         - !GetAtt flightcloudclusternode01.PrivateIp
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   dnsnode02:
-      Type: AWS::Route53::RecordSet
-      DependsOn: flightcloudclusterprivatedns
-      Properties:
-        HostedZoneName: !Sub
-          - "pri.${cn}.cluster.local."
-          - { cn: !Ref clustername }
-        Comment: Entry for node02
-        Name: !Sub
-          - "node02.pri.${cn}.cluster.local"
-          - { cn: !Ref clustername }
-        Type: A
-        TTL: '900'
-        ResourceRecords:
-        - !GetAtt flightcloudclusternode02.PrivateIp
+    Type: AWS::Route53::RecordSet
+    DependsOn: flightcloudclusterprivatedns
+    Properties:
+      HostedZoneName: !Sub
+        - "pri.${cn}.cluster.local."
+        - { cn: !Ref clustername }
+      Comment: Entry for node02
+      Name: !Sub
+        - "node02.pri.${cn}.cluster.local"
+        - { cn: !Ref clustername }
+      Type: A
+      TTL: '900'
+      ResourceRecords:
+      - !GetAtt flightcloudclusternode02.PrivateIp
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   dnsnode03:
-      Type: AWS::Route53::RecordSet
-      Condition: CreateNode03
-      DependsOn: flightcloudclusterprivatedns
-      Properties:
-        HostedZoneName: !Sub
-          - "pri.${cn}.cluster.local."
-          - { cn: !Ref clustername }
-        Comment: Entry for node03
-        Name: !Sub
-          - "node03.pri.${cn}.cluster.local"
-          - { cn: !Ref clustername }
-        Type: A
-        TTL: '900'
-        ResourceRecords:
-        - !GetAtt flightcloudclusternode03.PrivateIp
+    Type: AWS::Route53::RecordSet
+    Condition: CreateNode03
+    DependsOn: flightcloudclusterprivatedns
+    Properties:
+      HostedZoneName: !Sub
+        - "pri.${cn}.cluster.local."
+        - { cn: !Ref clustername }
+      Comment: Entry for node03
+      Name: !Sub
+        - "node03.pri.${cn}.cluster.local"
+        - { cn: !Ref clustername }
+      Type: A
+      TTL: '900'
+      ResourceRecords:
+      - !GetAtt flightcloudclusternode03.PrivateIp
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   dnsnode04:
-      Type: AWS::Route53::RecordSet
-      Condition: CreateNode04
-      DependsOn: flightcloudclusterprivatedns
-      Properties:
-        HostedZoneName: !Sub
-          - "pri.${cn}.cluster.local."
-          - { cn: !Ref clustername }
-        Comment: Entry for node04
-        Name: !Sub
-          - "node04.pri.${cn}.cluster.local"
-          - { cn: !Ref clustername }
-        Type: A
-        TTL: '900'
-        ResourceRecords:
-        - !GetAtt flightcloudclusternode04.PrivateIp
+    Type: AWS::Route53::RecordSet
+    Condition: CreateNode04
+    DependsOn: flightcloudclusterprivatedns
+    Properties:
+      HostedZoneName: !Sub
+        - "pri.${cn}.cluster.local."
+        - { cn: !Ref clustername }
+      Comment: Entry for node04
+      Name: !Sub
+        - "node04.pri.${cn}.cluster.local"
+        - { cn: !Ref clustername }
+      Type: A
+      TTL: '900'
+      ResourceRecords:
+      - !GetAtt flightcloudclusternode04.PrivateIp
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   dnsnode05:
-      Type: AWS::Route53::RecordSet
-      Condition: CreateNode05
-      DependsOn: flightcloudclusterprivatedns
-      Properties:
-        HostedZoneName: !Sub
-          - "pri.${cn}.cluster.local."
-          - { cn: !Ref clustername }
-        Comment: Entry for node05
-        Name: !Sub
-          - "node05.pri.${cn}.cluster.local"
-          - { cn: !Ref clustername }
-        Type: A
-        TTL: '900'
-        ResourceRecords:
-        - !GetAtt flightcloudclusternode05.PrivateIp
+    Type: AWS::Route53::RecordSet
+    Condition: CreateNode05
+    DependsOn: flightcloudclusterprivatedns
+    Properties:
+      HostedZoneName: !Sub
+        - "pri.${cn}.cluster.local."
+        - { cn: !Ref clustername }
+      Comment: Entry for node05
+      Name: !Sub
+        - "node05.pri.${cn}.cluster.local"
+        - { cn: !Ref clustername }
+      Type: A
+      TTL: '900'
+      ResourceRecords:
+      - !GetAtt flightcloudclusternode05.PrivateIp
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   dnsnode06:
-      Type: AWS::Route53::RecordSet
-      Condition: CreateNode06
-      DependsOn: flightcloudclusterprivatedns
-      Properties:
-        HostedZoneName: !Sub
-          - "pri.${cn}.cluster.local."
-          - { cn: !Ref clustername }
-        Comment: Entry for node06
-        Name: !Sub
-          - "node06.pri.${cn}.cluster.local"
-          - { cn: !Ref clustername }
-        Type: A
-        TTL: '900'
-        ResourceRecords:
-        - !GetAtt flightcloudclusternode06.PrivateIp
+    Type: AWS::Route53::RecordSet
+    Condition: CreateNode06
+    DependsOn: flightcloudclusterprivatedns
+    Properties:
+      HostedZoneName: !Sub
+        - "pri.${cn}.cluster.local."
+        - { cn: !Ref clustername }
+      Comment: Entry for node06
+      Name: !Sub
+        - "node06.pri.${cn}.cluster.local"
+        - { cn: !Ref clustername }
+      Type: A
+      TTL: '900'
+      ResourceRecords:
+      - !GetAtt flightcloudclusternode06.PrivateIp
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   dnsnode07:
-      Type: AWS::Route53::RecordSet
-      Condition: CreateNode07
-      DependsOn: flightcloudclusterprivatedns
-      Properties:
-        HostedZoneName: !Sub
-          - "pri.${cn}.cluster.local."
-          - { cn: !Ref clustername }
-        Comment: Entry for node07
-        Name: !Sub
-          - "node07.pri.${cn}.cluster.local"
-          - { cn: !Ref clustername }
-        Type: A
-        TTL: '900'
-        ResourceRecords:
-        - !GetAtt flightcloudclusternode07.PrivateIp
+    Type: AWS::Route53::RecordSet
+    Condition: CreateNode07
+    DependsOn: flightcloudclusterprivatedns
+    Properties:
+      HostedZoneName: !Sub
+        - "pri.${cn}.cluster.local."
+        - { cn: !Ref clustername }
+      Comment: Entry for node07
+      Name: !Sub
+        - "node07.pri.${cn}.cluster.local"
+        - { cn: !Ref clustername }
+      Type: A
+      TTL: '900'
+      ResourceRecords:
+      - !GetAtt flightcloudclusternode07.PrivateIp
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   dnsnode08:
-      Type: AWS::Route53::RecordSet
-      Condition: CreateNode08
-      DependsOn: flightcloudclusterprivatedns
-      Properties:
-        HostedZoneName: !Sub
-          - "pri.${cn}.cluster.local."
-          - { cn: !Ref clustername }
-        Comment: Entry for node08
-        Name: !Sub
-          - "node08.pri.${cn}.cluster.local"
-          - { cn: !Ref clustername }
-        Type: A
-        TTL: '900'
-        ResourceRecords:
-        - !GetAtt flightcloudclusternode08.PrivateIp
+    Type: AWS::Route53::RecordSet
+    Condition: CreateNode08
+    DependsOn: flightcloudclusterprivatedns
+    Properties:
+      HostedZoneName: !Sub
+        - "pri.${cn}.cluster.local."
+        - { cn: !Ref clustername }
+      Comment: Entry for node08
+      Name: !Sub
+        - "node08.pri.${cn}.cluster.local"
+        - { cn: !Ref clustername }
+      Type: A
+      TTL: '900'
+      ResourceRecords:
+      - !GetAtt flightcloudclusternode08.PrivateIp
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclustergateway1network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -299,6 +426,13 @@ Resources:
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
       SubnetId: !Ref flightcloudclusternetwork1
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclustergateway1:
     Type: AWS::EC2::Instance
@@ -310,6 +444,12 @@ Resources:
           Value: !Sub
            - "${cn}_gateway1"
            - { cn: !Ref clustername }
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -331,12 +471,26 @@ Resources:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclustergateway1pubIPassociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
       NetworkInterfaceId: !Ref flightcloudclustergateway1network1interface
       AllocationId: !GetAtt flightcloudclustergateway1pubIP.AllocationId
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "core"
+          Value: "true"
 
   flightcloudclusternode01network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -345,6 +499,16 @@ Resources:
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
       SubnetId: !Ref flightcloudclusternetwork1
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode01:
     Type: AWS::EC2::Instance
@@ -356,6 +520,15 @@ Resources:
           Value: !Sub
            - "${cn}_node01"
            - { cn: !Ref clustername }
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -377,12 +550,32 @@ Resources:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode01pubIPassociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
       NetworkInterfaceId: !Ref flightcloudclusternode01network1interface
       AllocationId: !GetAtt flightcloudclusternode01pubIP.AllocationId
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode02network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -391,6 +584,16 @@ Resources:
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
       SubnetId: !Ref flightcloudclusternetwork1
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode02:
     Type: AWS::EC2::Instance
@@ -402,6 +605,15 @@ Resources:
           Value: !Sub
            - "${cn}_node02"
            - { cn: !Ref clustername }
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -423,12 +635,32 @@ Resources:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode02pubIPassociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
       NetworkInterfaceId: !Ref flightcloudclusternode02network1interface
       AllocationId: !GetAtt flightcloudclusternode02pubIP.AllocationId
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode03network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -438,6 +670,16 @@ Resources:
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
       SubnetId: !Ref flightcloudclusternetwork1
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode03:
     Type: AWS::EC2::Instance
@@ -450,6 +692,15 @@ Resources:
           Value: !Sub
            - "${cn}_node03"
            - { cn: !Ref clustername }
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -472,6 +723,16 @@ Resources:
     Condition: CreateNode03
     Properties:
       Domain: vpc
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode03pubIPassociation:
     Type: AWS::EC2::EIPAssociation
@@ -479,6 +740,16 @@ Resources:
     Properties:
       NetworkInterfaceId: !Ref flightcloudclusternode03network1interface
       AllocationId: !GetAtt flightcloudclusternode03pubIP.AllocationId
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode04network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -488,6 +759,16 @@ Resources:
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
       SubnetId: !Ref flightcloudclusternetwork1
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode04:
     Type: AWS::EC2::Instance
@@ -500,6 +781,15 @@ Resources:
           Value: !Sub
            - "${cn}_node04"
            - { cn: !Ref clustername }
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -522,6 +812,16 @@ Resources:
     Condition: CreateNode04
     Properties:
       Domain: vpc
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode04pubIPassociation:
     Type: AWS::EC2::EIPAssociation
@@ -529,6 +829,16 @@ Resources:
     Properties:
       NetworkInterfaceId: !Ref flightcloudclusternode04network1interface
       AllocationId: !GetAtt flightcloudclusternode04pubIP.AllocationId
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode05network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -538,6 +848,16 @@ Resources:
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
       SubnetId: !Ref flightcloudclusternetwork1
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode05:
     Type: AWS::EC2::Instance
@@ -550,6 +870,15 @@ Resources:
           Value: !Sub
            - "${cn}_node05"
            - { cn: !Ref clustername }
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -572,6 +901,16 @@ Resources:
     Condition: CreateNode05
     Properties:
       Domain: vpc
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode05pubIPassociation:
     Type: AWS::EC2::EIPAssociation
@@ -579,6 +918,16 @@ Resources:
     Properties:
       NetworkInterfaceId: !Ref flightcloudclusternode05network1interface
       AllocationId: !GetAtt flightcloudclusternode05pubIP.AllocationId
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode06network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -588,6 +937,16 @@ Resources:
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
       SubnetId: !Ref flightcloudclusternetwork1
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode06:
     Type: AWS::EC2::Instance
@@ -600,6 +959,15 @@ Resources:
           Value: !Sub
            - "${cn}_node06"
            - { cn: !Ref clustername }
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -622,6 +990,16 @@ Resources:
     Condition: CreateNode06
     Properties:
       Domain: vpc
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode06pubIPassociation:
     Type: AWS::EC2::EIPAssociation
@@ -629,6 +1007,16 @@ Resources:
     Properties:
       NetworkInterfaceId: !Ref flightcloudclusternode06network1interface
       AllocationId: !GetAtt flightcloudclusternode06pubIP.AllocationId
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode07network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -638,6 +1026,16 @@ Resources:
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
       SubnetId: !Ref flightcloudclusternetwork1
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode07:
     Type: AWS::EC2::Instance
@@ -650,6 +1048,15 @@ Resources:
           Value: !Sub
            - "${cn}_node07"
            - { cn: !Ref clustername }
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -672,6 +1079,16 @@ Resources:
     Condition: CreateNode07
     Properties:
       Domain: vpc
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode07pubIPassociation:
     Type: AWS::EC2::EIPAssociation
@@ -679,6 +1096,16 @@ Resources:
     Properties:
       NetworkInterfaceId: !Ref flightcloudclusternode07network1interface
       AllocationId: !GetAtt flightcloudclusternode07pubIP.AllocationId
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode08network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -688,6 +1115,16 @@ Resources:
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
       SubnetId: !Ref flightcloudclusternetwork1
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode08:
     Type: AWS::EC2::Instance
@@ -700,6 +1137,15 @@ Resources:
           Value: !Sub
            - "${cn}_node08"
            - { cn: !Ref clustername }
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -722,6 +1168,16 @@ Resources:
     Condition: CreateNode08
     Properties:
       Domain: vpc
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
   flightcloudclusternode08pubIPassociation:
     Type: AWS::EC2::EIPAssociation
@@ -729,4 +1185,14 @@ Resources:
     Properties:
       NetworkInterfaceId: !Ref flightcloudclusternode08network1interface
       AllocationId: !GetAtt flightcloudclusternode08pubIP.AllocationId
+      Tags:
+        - 
+          Key: "project"
+          Value: !Ref clustername
+        - 
+          Key: "compute"
+          Value: "true"
+        -
+          Key: "compute_group"
+          Value: "default"
 
