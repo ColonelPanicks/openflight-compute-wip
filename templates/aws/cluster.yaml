@@ -421,7 +421,6 @@ Resources:
 
   flightcloudclusternode01:
     Type: AWS::EC2::Instance
-    DependsOn: flightcloudclusternode01pubIPassociation
     Properties:
       Tags:
         -
@@ -475,7 +474,6 @@ Resources:
 
   flightcloudclusternode02:
     Type: AWS::EC2::Instance
-    DependsOn: flightcloudclusternode02pubIPassociation
     Properties:
       Tags:
         -
@@ -530,7 +528,6 @@ Resources:
 
   flightcloudclusternode03:
     Type: AWS::EC2::Instance
-    DependsOn: flightcloudclusternode03pubIPassociation
     Condition: CreateNode03
     Properties:
       Tags:
@@ -586,7 +583,6 @@ Resources:
 
   flightcloudclusternode04:
     Type: AWS::EC2::Instance
-    DependsOn: flightcloudclusternode04pubIPassociation
     Condition: CreateNode04
     Properties:
       Tags:
@@ -642,7 +638,6 @@ Resources:
 
   flightcloudclusternode05:
     Type: AWS::EC2::Instance
-    DependsOn: flightcloudclusternode05pubIPassociation
     Condition: CreateNode05
     Properties:
       Tags:
@@ -698,7 +693,6 @@ Resources:
 
   flightcloudclusternode06:
     Type: AWS::EC2::Instance
-    DependsOn: flightcloudclusternode06pubIPassociation
     Condition: CreateNode06
     Properties:
       Tags:
@@ -754,7 +748,6 @@ Resources:
 
   flightcloudclusternode07:
     Type: AWS::EC2::Instance
-    DependsOn: flightcloudclusternode07pubIPassociation
     Condition: CreateNode07
     Properties:
       Tags:
@@ -810,7 +803,6 @@ Resources:
 
   flightcloudclusternode08:
     Type: AWS::EC2::Instance
-    DependsOn: flightcloudclusternode08pubIPassociation
     Condition: CreateNode08
     Properties:
       Tags:
