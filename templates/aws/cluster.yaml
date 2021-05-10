@@ -455,27 +455,6 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclusternode01pubIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "compute"
-          Value: "true"
-        -
-          Key: "compute_group"
-          Value: "default"
-
-  flightcloudclusternode01pubIPassociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      NetworkInterfaceId: !Ref flightcloudclusternode01network1interface
-      AllocationId: !GetAtt flightcloudclusternode01pubIP.AllocationId
-
   flightcloudclusternode02network1interface:
     Type: AWS::EC2::NetworkInterface
     Properties:
@@ -529,27 +508,6 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
-
-  flightcloudclusternode02pubIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "compute"
-          Value: "true"
-        -
-          Key: "compute_group"
-          Value: "default"
-
-  flightcloudclusternode02pubIPassociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      NetworkInterfaceId: !Ref flightcloudclusternode02network1interface
-      AllocationId: !GetAtt flightcloudclusternode02pubIP.AllocationId
 
   flightcloudclusternode03network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -607,29 +565,6 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclusternode03pubIP:
-    Type: AWS::EC2::EIP
-    Condition: CreateNode03
-    Properties:
-      Domain: vpc
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "compute"
-          Value: "true"
-        -
-          Key: "compute_group"
-          Value: "default"
-
-  flightcloudclusternode03pubIPassociation:
-    Type: AWS::EC2::EIPAssociation
-    Condition: CreateNode03
-    Properties:
-      NetworkInterfaceId: !Ref flightcloudclusternode03network1interface
-      AllocationId: !GetAtt flightcloudclusternode03pubIP.AllocationId
-
   flightcloudclusternode04network1interface:
     Type: AWS::EC2::NetworkInterface
     Condition: CreateNode04
@@ -685,29 +620,6 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
-
-  flightcloudclusternode04pubIP:
-    Type: AWS::EC2::EIP
-    Condition: CreateNode04
-    Properties:
-      Domain: vpc
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "compute"
-          Value: "true"
-        -
-          Key: "compute_group"
-          Value: "default"
-
-  flightcloudclusternode04pubIPassociation:
-    Type: AWS::EC2::EIPAssociation
-    Condition: CreateNode04
-    Properties:
-      NetworkInterfaceId: !Ref flightcloudclusternode04network1interface
-      AllocationId: !GetAtt flightcloudclusternode04pubIP.AllocationId
 
   flightcloudclusternode05network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -765,29 +677,6 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclusternode05pubIP:
-    Type: AWS::EC2::EIP
-    Condition: CreateNode05
-    Properties:
-      Domain: vpc
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "compute"
-          Value: "true"
-        -
-          Key: "compute_group"
-          Value: "default"
-
-  flightcloudclusternode05pubIPassociation:
-    Type: AWS::EC2::EIPAssociation
-    Condition: CreateNode05
-    Properties:
-      NetworkInterfaceId: !Ref flightcloudclusternode05network1interface
-      AllocationId: !GetAtt flightcloudclusternode05pubIP.AllocationId
-
   flightcloudclusternode06network1interface:
     Type: AWS::EC2::NetworkInterface
     Condition: CreateNode06
@@ -843,29 +732,6 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
-
-  flightcloudclusternode06pubIP:
-    Type: AWS::EC2::EIP
-    Condition: CreateNode06
-    Properties:
-      Domain: vpc
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "compute"
-          Value: "true"
-        -
-          Key: "compute_group"
-          Value: "default"
-
-  flightcloudclusternode06pubIPassociation:
-    Type: AWS::EC2::EIPAssociation
-    Condition: CreateNode06
-    Properties:
-      NetworkInterfaceId: !Ref flightcloudclusternode06network1interface
-      AllocationId: !GetAtt flightcloudclusternode06pubIP.AllocationId
 
   flightcloudclusternode07network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -923,29 +789,6 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclusternode07pubIP:
-    Type: AWS::EC2::EIP
-    Condition: CreateNode07
-    Properties:
-      Domain: vpc
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "compute"
-          Value: "true"
-        -
-          Key: "compute_group"
-          Value: "default"
-
-  flightcloudclusternode07pubIPassociation:
-    Type: AWS::EC2::EIPAssociation
-    Condition: CreateNode07
-    Properties:
-      NetworkInterfaceId: !Ref flightcloudclusternode07network1interface
-      AllocationId: !GetAtt flightcloudclusternode07pubIP.AllocationId
-
   flightcloudclusternode08network1interface:
     Type: AWS::EC2::NetworkInterface
     Condition: CreateNode08
@@ -1001,27 +844,4 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
-
-  flightcloudclusternode08pubIP:
-    Type: AWS::EC2::EIP
-    Condition: CreateNode08
-    Properties:
-      Domain: vpc
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "compute"
-          Value: "true"
-        -
-          Key: "compute_group"
-          Value: "default"
-
-  flightcloudclusternode08pubIPassociation:
-    Type: AWS::EC2::EIPAssociation
-    Condition: CreateNode08
-    Properties:
-      NetworkInterfaceId: !Ref flightcloudclusternode08network1interface
-      AllocationId: !GetAtt flightcloudclusternode08pubIP.AllocationId
 
