@@ -106,13 +106,6 @@ Resources:
       RouteTableId: !Ref flightcloudclusterroutetable
       DestinationCidrBlock: '0.0.0.0/0'
       GatewayId: !Ref flightcloudclusterinternetgateway
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   flightcloudclustersecuritygroup:
     Type: AWS::EC2::SecurityGroup
