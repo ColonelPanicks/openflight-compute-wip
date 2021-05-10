@@ -53,6 +53,10 @@
       "name": "flightcloudclusternetwork",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "core": "true"
+      },
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
@@ -66,11 +70,7 @@
               "addressPrefix": "10.10.0.0/19"
             }
           }
-        ],
-        "tags": {
-            "project": "[parameters('clustername')]",
-            "core": "true"
-        }
+        ]
       }
     },
     {
@@ -78,6 +78,10 @@
       "name": "flightcloudclustersecuritygroup",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "core": "true"
+      },
       "properties": {
         "securityRules": [{
            "name": "inbound-ssh",
@@ -130,11 +134,7 @@
              "priority": 1010,
              "direction": "Inbound"
            }
-         }],
-        "tags": {
-            "project": "[parameters('clustername')]",
-            "core": "true"
-        }
+         }]
       }
     },
     {
@@ -142,15 +142,15 @@
       "name": "flightcloudclustergateway1pubIP",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "core": "true"
+      },
       "properties": {
         "publicIPAllocationMethod": "Static",
         "idleTimeoutInMinutes": 30,
         "dnsSettings": {
           "domainNameLabel": "[concat('gateway1-', parameters('clustername'))]"
-        },
-        "tags": {
-            "project": "[parameters('clustername')]",
-            "core": "true"
         }
       }
     },
@@ -159,6 +159,10 @@
       "name": "flightcloudclustergateway1network1interface",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "core": "true"
+      },
       "properties": {
         "ipConfigurations": [{
           "name": "flightcloudclustergateway1network1ip",
@@ -174,10 +178,6 @@
         }],
         "networkSecurityGroup": {
           "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
-        },
-        "tags": {
-            "project": "[parameters('clustername')]",
-            "core": "true"
         }
       },
       "dependsOn": [
@@ -189,6 +189,10 @@
       "name": "flightcloudclustergateway1",
       "apiVersion": "2016-04-30-preview",
       "location": "[resourceGroup().location]",
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "core": "true"
+      },
       "properties": {
         "hardwareProfile": {
               "vmSize": "[parameters('gatewayinstancetype')]"
@@ -230,10 +234,6 @@
                 }
           }
           ]
-        },
-        "tags": {
-            "project": "[parameters('clustername')]",
-            "core": "true"
         }
       },
       "dependsOn": [
@@ -249,16 +249,16 @@
           "name": "pubLoop",
           "count": "[parameters('computeNodesCount')]"
       },
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "compute": "true",
+          "compute_group": "default"
+      },
       "properties": {
         "publicIPAllocationMethod": "Static",
         "idleTimeoutInMinutes": 30,
         "dnsSettings": {
           "domainNameLabel": "[concat('node0', copyindex(1), '-', parameters('clustername'))]"
-        },
-        "tags": {
-            "project": "[parameters('clustername')]",
-            "compute": "true",
-            "compute_group": "default"
         }
       }
     },
@@ -270,6 +270,11 @@
       "copy": {
           "name": "nicLoop",
           "count": "[parameters('computeNodesCount')]"
+      },
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "compute": "true",
+          "compute_group": "default"
       },
       "properties": {
         "ipConfigurations": [{
@@ -286,11 +291,6 @@
         }],
         "networkSecurityGroup": {
           "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
-        },
-        "tags": {
-            "project": "[parameters('clustername')]",
-            "compute": "true",
-            "compute_group": "default"
         }
       },
       "dependsOn": [
@@ -305,6 +305,11 @@
       "copy": {
           "name": "computeLoop",
           "count": "[parameters('computeNodesCount')]"
+      },
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "compute": "true",
+          "compute_group": "default"
       },
       "properties": {
         "hardwareProfile": {
@@ -347,12 +352,7 @@
                 }
           }
           ]
-      },
-        "tags": {
-            "project": "[parameters('clustername')]",
-            "compute": "true",
-            "compute_group": "default"
-        }
+      }
     },
     "dependsOn": [
         "nicLoop"
