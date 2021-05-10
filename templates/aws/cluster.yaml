@@ -200,13 +200,6 @@ Resources:
       TTL: '900'
       ResourceRecords:
       - !GetAtt flightcloudclustergateway1.PrivateIp
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   dnsnode01:
     Type: AWS::Route53::RecordSet
@@ -223,13 +216,6 @@ Resources:
       TTL: '900'
       ResourceRecords:
         - !GetAtt flightcloudclusternode01.PrivateIp
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   dnsnode02:
     Type: AWS::Route53::RecordSet
@@ -246,13 +232,6 @@ Resources:
       TTL: '900'
       ResourceRecords:
       - !GetAtt flightcloudclusternode02.PrivateIp
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   dnsnode03:
     Type: AWS::Route53::RecordSet
@@ -270,13 +249,6 @@ Resources:
       TTL: '900'
       ResourceRecords:
       - !GetAtt flightcloudclusternode03.PrivateIp
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   dnsnode04:
     Type: AWS::Route53::RecordSet
@@ -294,13 +266,6 @@ Resources:
       TTL: '900'
       ResourceRecords:
       - !GetAtt flightcloudclusternode04.PrivateIp
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   dnsnode05:
     Type: AWS::Route53::RecordSet
@@ -318,13 +283,6 @@ Resources:
       TTL: '900'
       ResourceRecords:
       - !GetAtt flightcloudclusternode05.PrivateIp
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   dnsnode06:
     Type: AWS::Route53::RecordSet
@@ -342,13 +300,6 @@ Resources:
       TTL: '900'
       ResourceRecords:
       - !GetAtt flightcloudclusternode06.PrivateIp
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   dnsnode07:
     Type: AWS::Route53::RecordSet
@@ -366,13 +317,6 @@ Resources:
       TTL: '900'
       ResourceRecords:
       - !GetAtt flightcloudclusternode07.PrivateIp
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   dnsnode08:
     Type: AWS::Route53::RecordSet
@@ -390,13 +334,6 @@ Resources:
       TTL: '900'
       ResourceRecords:
       - !GetAtt flightcloudclusternode08.PrivateIp
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   flightcloudclustergateway1network1interface:
     Type: AWS::EC2::NetworkInterface
