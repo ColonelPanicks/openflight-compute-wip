@@ -66,7 +66,11 @@
               "addressPrefix": "10.10.0.0/19"
             }
           }
-        ]
+        ],
+        "tags": {
+            "project": "[parameters('clustername')]",
+            "core": "true"
+        }
       }
     },
     {
@@ -126,8 +130,12 @@
              "priority": 1010,
              "direction": "Inbound"
            }
-         }]
-       }
+         }],
+        "tags": {
+            "project": "[parameters('clustername')]",
+            "core": "true"
+        }
+      }
     },
     {
       "type": "Microsoft.Network/publicIPAddresses",
@@ -139,6 +147,10 @@
         "idleTimeoutInMinutes": 30,
         "dnsSettings": {
           "domainNameLabel": "[concat('gateway1-', parameters('clustername'))]"
+        },
+        "tags": {
+            "project": "[parameters('clustername')]",
+            "core": "true"
         }
       }
     },
@@ -162,6 +174,10 @@
         }],
         "networkSecurityGroup": {
           "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
+        },
+        "tags": {
+            "project": "[parameters('clustername')]",
+            "core": "true"
         }
       },
       "dependsOn": [
@@ -214,6 +230,10 @@
                 }
           }
           ]
+        },
+        "tags": {
+            "project": "[parameters('clustername')]",
+            "core": "true"
         }
       },
       "dependsOn": [
@@ -234,6 +254,11 @@
         "idleTimeoutInMinutes": 30,
         "dnsSettings": {
           "domainNameLabel": "[concat('node0', copyindex(1), '-', parameters('clustername'))]"
+        },
+        "tags": {
+            "project": "[parameters('clustername')]",
+            "compute": "true",
+            "compute_group": "default"
         }
       }
     },
@@ -261,6 +286,11 @@
         }],
         "networkSecurityGroup": {
           "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
+        },
+        "tags": {
+            "project": "[parameters('clustername')]",
+            "compute": "true",
+            "compute_group": "default"
         }
       },
       "dependsOn": [
@@ -317,7 +347,12 @@
                 }
           }
           ]
-      }
+      },
+        "tags": {
+            "project": "[parameters('clustername')]",
+            "compute": "true",
+            "compute_group": "default"
+        }
     },
     "dependsOn": [
         "nicLoop"
