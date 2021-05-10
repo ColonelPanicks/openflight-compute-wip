@@ -63,13 +63,6 @@ Resources:
     Properties:
       InternetGatewayId: !Ref flightcloudclusterinternetgateway
       VpcId: !Ref flightcloudclusternetwork
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   flightcloudclusterroutetable:
     Type: AWS::EC2::RouteTable
@@ -198,7 +191,7 @@ Resources:
       VPCs:
       - VPCId: !Ref flightcloudclusternetwork
         VPCRegion: !Ref 'AWS::Region'
-      Tags:
+      HostedZoneTags:
         - 
           Key: "project"
           Value: !Ref clustername
