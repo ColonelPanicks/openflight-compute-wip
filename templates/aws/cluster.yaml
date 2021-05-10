@@ -98,13 +98,6 @@ Resources:
     Properties:
       SubnetId: !Ref flightcloudclusternetwork1
       RouteTableId: !Ref flightcloudclusterroutetable
-      Tags:
-        - 
-          Key: "project"
-          Value: !Ref clustername
-        - 
-          Key: "core"
-          Value: "true"
 
   flightcloudclusterrouteinternetgateway:
     Type: AWS::EC2::Route
