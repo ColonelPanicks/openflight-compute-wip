@@ -7,9 +7,12 @@ Parameters:
   clustername:
     Type: String
     Description: 'Name of the cluster'
-  customdata:
+  customdatagw:
     Type: String
-    Description: 'Cloud-init customdata for all systems encoded in base64'
+    Description: 'Cloud-init customdata for gateway encoded in base64'
+  customdatanode:
+    Type: String
+    Description: 'Cloud-init customdata for nodes encoded in base64'
   computeNodesCount: 
     Type: Number
     Default: 2
@@ -342,6 +345,7 @@ Resources:
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
       SubnetId: !Ref flightcloudclusternetwork1
+      PrivateIpAddress: 10.10.0.11
       Tags:
         - 
           Key: "project"
@@ -376,7 +380,7 @@ Resources:
         -
           NetworkInterfaceId: !Ref flightcloudclustergateway1network1interface
           DeviceIndex: 0
-      UserData: !Ref customdata
+      UserData: !Ref customdatagw
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -447,7 +451,7 @@ Resources:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode01network1interface
           DeviceIndex: 0
-      UserData: !Ref customdata
+      UserData: !Ref customdatanode
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -500,7 +504,7 @@ Resources:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode02network1interface
           DeviceIndex: 0
-      UserData: !Ref customdata
+      UserData: !Ref customdatanode
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -555,7 +559,7 @@ Resources:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode03network1interface
           DeviceIndex: 0
-      UserData: !Ref customdata
+      UserData: !Ref customdatanode
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -610,7 +614,7 @@ Resources:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode04network1interface
           DeviceIndex: 0
-      UserData: !Ref customdata
+      UserData: !Ref customdatanode
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -665,7 +669,7 @@ Resources:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode05network1interface
           DeviceIndex: 0
-      UserData: !Ref customdata
+      UserData: !Ref customdatanode
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -720,7 +724,7 @@ Resources:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode06network1interface
           DeviceIndex: 0
-      UserData: !Ref customdata
+      UserData: !Ref customdatanode
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -775,7 +779,7 @@ Resources:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode07network1interface
           DeviceIndex: 0
-      UserData: !Ref customdata
+      UserData: !Ref customdatanode
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -830,7 +834,7 @@ Resources:
         -
           NetworkInterfaceId: !Ref flightcloudclusternode08network1interface
           DeviceIndex: 0
-      UserData: !Ref customdata
+      UserData: !Ref customdatanode
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:

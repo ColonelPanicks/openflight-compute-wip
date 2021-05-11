@@ -14,10 +14,16 @@
               "description": "Name of the cluster"
           }
       },
-      "customdata": {
+      "customdatagw": {
           "type": "string",
           "metadata": {
-              "description": "Cloud-init customdata for all systems encoded in base64"
+              "description": "Cloud-init customdata for gateway encoded in base64"
+          }
+      },
+      "customdatanode": {
+          "type": "string",
+          "metadata": {
+              "description": "Cloud-init customdata for nodes encoded in base64"
           }
       },
       "gatewayinstancetype": {
@@ -167,7 +173,8 @@
         "ipConfigurations": [{
           "name": "flightcloudclustergateway1network1ip",
           "properties": {
-            "privateIPAllocationMethod": "Dynamic",
+            "privateIPAllocationMethod": "Static",
+            "privateIPAddress": "10.10.0.11",
             "publicIPAddress": {
               "id": "[resourceId('Microsoft.Network/publicIpAddresses', 'flightcloudclustergateway1pubIP')]"
             },
@@ -212,7 +219,7 @@
           "computerName": "[concat('gateway1.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
           "adminPassword": "OpenFlightPlaceholderPassword",
-          "customdata": "[parameters('customdata')]",
+          "customdata": "[parameters('customdatagw')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
@@ -330,7 +337,7 @@
           "computerName": "[concat('node0', copyindex(1), '.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
           "adminPassword": "OpenFlightPlaceholderPassword",
-          "customdata": "[parameters('customdata')]",
+          "customdata": "[parameters('customdatanode')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
