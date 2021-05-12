@@ -248,28 +248,6 @@
       ]
     },
     {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat('flightcloudclusternode0', copyindex(1), 'pubIP')]",
-      "apiVersion": "2017-03-01",
-      "location": "[resourceGroup().location]",
-      "copy": {
-          "name": "pubLoop",
-          "count": "[parameters('computeNodesCount')]"
-      },
-      "tags": {
-          "project": "[parameters('clustername')]",
-          "compute": "true",
-          "compute_group": "default"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "Static",
-        "idleTimeoutInMinutes": 30,
-        "dnsSettings": {
-          "domainNameLabel": "[concat('node0', copyindex(1), '-', parameters('clustername'))]"
-        }
-      }
-    },
-    {
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat('flightcloudclusternode0', copyindex(1), 'network1interface')]",
       "apiVersion": "2017-03-01",
@@ -288,9 +266,6 @@
           "name": "[concat('flightcloudclusternode0', copyindex(1), 'network1ip')]",
           "properties": {
             "privateIPAllocationMethod": "Dynamic",
-            "publicIPAddress": {
-              "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat('flightcloudclusternode0', copyindex(1), 'pubIP'))]"
-            },
             "subnet": {
               "id": "[variables('subnet1Ref')]"
             }
