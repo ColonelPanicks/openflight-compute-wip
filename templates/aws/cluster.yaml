@@ -9,20 +9,20 @@ Parameters:
     Description: 'Name of the cluster'
   customdatagw:
     Type: String
-    Description: 'Cloud-init customdata for gateway encoded in base64'
+    Description: 'Cloud-init customdata for chead encoded in base64'
   customdatanode:
     Type: String
-    Description: 'Cloud-init customdata for nodes encoded in base64'
+    Description: 'Cloud-init customdata for cnodes encoded in base64'
   computeNodesCount: 
     Type: Number
     Default: 2
     MinValue: 2
     MaxValue: 8
     Description: 'Number of compute nodes to include in cluster'
-  gatewayinstancetype:
+  cheadinstancetype:
     Type: String
     Default: 't3.small'
-    Description: 'Instance type to be used for the gateway node'
+    Description: 'Instance type to be used for the chead node'
   computeinstancetype:
     Type: String
     Default: 't3.small'
@@ -188,23 +188,23 @@ Resources:
           Key: "core"
           Value: "true"
 
-  dnsgateway1:
+  dnschead1:
     Type: AWS::Route53::RecordSet
     DependsOn: flightcloudclusterprivatedns
     Properties:
       HostedZoneName: !Sub
         - "pri.${cn}.cluster.local."
         - { cn: !Ref clustername }
-      Comment: Entry for gateway1
+      Comment: Entry for chead1
       Name: !Sub
-        - "gateway1.pri.${cn}.cluster.local"
+        - "chead1.pri.${cn}.cluster.local"
         - { cn: !Ref clustername }
       Type: A
       TTL: '900'
       ResourceRecords:
-      - !GetAtt flightcloudclustergateway1.PrivateIp
+      - !GetAtt chead1.PrivateIp
 
-  dnsnode01:
+  dnscnode01:
     Type: AWS::Route53::RecordSet
     DependsOn: flightcloudclusterprivatedns
     Properties:
@@ -213,14 +213,14 @@ Resources:
         - { cn: !Ref clustername }
       Comment: Entry for node01
       Name: !Sub
-        - "node01.pri.${cn}.cluster.local"
+        - "cnode01.pri.${cn}.cluster.local"
         - { cn: !Ref clustername }
       Type: A
       TTL: '900'
       ResourceRecords:
-        - !GetAtt flightcloudclusternode01.PrivateIp
+        - !GetAtt cnode01.PrivateIp
 
-  dnsnode02:
+  dnscnode02:
     Type: AWS::Route53::RecordSet
     DependsOn: flightcloudclusterprivatedns
     Properties:
@@ -229,14 +229,14 @@ Resources:
         - { cn: !Ref clustername }
       Comment: Entry for node02
       Name: !Sub
-        - "node02.pri.${cn}.cluster.local"
+        - "cnode02.pri.${cn}.cluster.local"
         - { cn: !Ref clustername }
       Type: A
       TTL: '900'
       ResourceRecords:
-      - !GetAtt flightcloudclusternode02.PrivateIp
+      - !GetAtt cnode02.PrivateIp
 
-  dnsnode03:
+  dnscnode03:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode03
     DependsOn: flightcloudclusterprivatedns
@@ -246,14 +246,14 @@ Resources:
         - { cn: !Ref clustername }
       Comment: Entry for node03
       Name: !Sub
-        - "node03.pri.${cn}.cluster.local"
+        - "cnode03.pri.${cn}.cluster.local"
         - { cn: !Ref clustername }
       Type: A
       TTL: '900'
       ResourceRecords:
-      - !GetAtt flightcloudclusternode03.PrivateIp
+      - !GetAtt cnode03.PrivateIp
 
-  dnsnode04:
+  dnscnode04:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode04
     DependsOn: flightcloudclusterprivatedns
@@ -263,14 +263,14 @@ Resources:
         - { cn: !Ref clustername }
       Comment: Entry for node04
       Name: !Sub
-        - "node04.pri.${cn}.cluster.local"
+        - "cnode04.pri.${cn}.cluster.local"
         - { cn: !Ref clustername }
       Type: A
       TTL: '900'
       ResourceRecords:
-      - !GetAtt flightcloudclusternode04.PrivateIp
+      - !GetAtt cnode04.PrivateIp
 
-  dnsnode05:
+  dnscnode05:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode05
     DependsOn: flightcloudclusterprivatedns
@@ -280,14 +280,14 @@ Resources:
         - { cn: !Ref clustername }
       Comment: Entry for node05
       Name: !Sub
-        - "node05.pri.${cn}.cluster.local"
+        - "cnode05.pri.${cn}.cluster.local"
         - { cn: !Ref clustername }
       Type: A
       TTL: '900'
       ResourceRecords:
-      - !GetAtt flightcloudclusternode05.PrivateIp
+      - !GetAtt cnode05.PrivateIp
 
-  dnsnode06:
+  dnscnode06:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode06
     DependsOn: flightcloudclusterprivatedns
@@ -297,14 +297,14 @@ Resources:
         - { cn: !Ref clustername }
       Comment: Entry for node06
       Name: !Sub
-        - "node06.pri.${cn}.cluster.local"
+        - "cnode06.pri.${cn}.cluster.local"
         - { cn: !Ref clustername }
       Type: A
       TTL: '900'
       ResourceRecords:
-      - !GetAtt flightcloudclusternode06.PrivateIp
+      - !GetAtt cnode06.PrivateIp
 
-  dnsnode07:
+  dnscnode07:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode07
     DependsOn: flightcloudclusterprivatedns
@@ -314,14 +314,14 @@ Resources:
         - { cn: !Ref clustername }
       Comment: Entry for node07
       Name: !Sub
-        - "node07.pri.${cn}.cluster.local"
+        - "cnode07.pri.${cn}.cluster.local"
         - { cn: !Ref clustername }
       Type: A
       TTL: '900'
       ResourceRecords:
-      - !GetAtt flightcloudclusternode07.PrivateIp
+      - !GetAtt cnode07.PrivateIp
 
-  dnsnode08:
+  dnscnode08:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode08
     DependsOn: flightcloudclusterprivatedns
@@ -331,14 +331,14 @@ Resources:
         - { cn: !Ref clustername }
       Comment: Entry for node08
       Name: !Sub
-        - "node08.pri.${cn}.cluster.local"
+        - "cnode08.pri.${cn}.cluster.local"
         - { cn: !Ref clustername }
       Type: A
       TTL: '900'
       ResourceRecords:
-      - !GetAtt flightcloudclusternode08.PrivateIp
+      - !GetAtt cnode08.PrivateIp
 
-  flightcloudclustergateway1network1interface:
+  chead1network1interface:
     Type: AWS::EC2::NetworkInterface
     Properties:
       SourceDestCheck: false
@@ -354,15 +354,15 @@ Resources:
           Key: "core"
           Value: "true"
 
-  flightcloudclustergateway1:
+  chead1:
     Type: AWS::EC2::Instance
-    DependsOn: flightcloudclustergateway1pubIPassociation
+    DependsOn: chead1pubIPassociation
     Properties:
       Tags:
         -
           Key: "Name"
           Value: !Sub
-           - "${cn}_gateway1"
+           - "${cn}_chead1"
            - { cn: !Ref clustername }
         - 
           Key: "project"
@@ -374,11 +374,11 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       ImageId: !Ref sourceimage
-      InstanceType: !Ref gatewayinstancetype
+      InstanceType: !Ref cheadinstancetype
       Monitoring: true
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref flightcloudclustergateway1network1interface
+          NetworkInterfaceId: !Ref chead1network1interface
           DeviceIndex: 0
       UserData: !Ref customdatagw
       BlockDeviceMappings:
@@ -387,7 +387,7 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclustergateway1pubIP: 
+  chead1pubIP: 
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
@@ -399,13 +399,13 @@ Resources:
           Key: "core"
           Value: "true"
 
-  flightcloudclustergateway1pubIPassociation:
+  chead1pubIPassociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      NetworkInterfaceId: !Ref flightcloudclustergateway1network1interface
-      AllocationId: !GetAtt flightcloudclustergateway1pubIP.AllocationId
+      NetworkInterfaceId: !Ref chead1network1interface
+      AllocationId: !GetAtt chead1pubIP.AllocationId
 
-  flightcloudclusternode01network1interface:
+  cnode01network1interface:
     Type: AWS::EC2::NetworkInterface
     Properties:
       SourceDestCheck: false
@@ -423,7 +423,7 @@ Resources:
           Key: "compute_group"
           Value: "default"
 
-  flightcloudclusternode01:
+  cnode01:
     Type: AWS::EC2::Instance
     Properties:
       Tags:
@@ -449,7 +449,7 @@ Resources:
       Monitoring: true
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref flightcloudclusternode01network1interface
+          NetworkInterfaceId: !Ref cnode01network1interface
           DeviceIndex: 0
       UserData: !Ref customdatanode
       BlockDeviceMappings:
@@ -458,7 +458,7 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclusternode02network1interface:
+  cnode02network1interface:
     Type: AWS::EC2::NetworkInterface
     Properties:
       SourceDestCheck: false
@@ -476,7 +476,7 @@ Resources:
           Key: "compute_group"
           Value: "default"
 
-  flightcloudclusternode02:
+  cnode02:
     Type: AWS::EC2::Instance
     Properties:
       Tags:
@@ -502,7 +502,7 @@ Resources:
       Monitoring: true
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref flightcloudclusternode02network1interface
+          NetworkInterfaceId: !Ref cnode02network1interface
           DeviceIndex: 0
       UserData: !Ref customdatanode
       BlockDeviceMappings:
@@ -511,7 +511,7 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclusternode03network1interface:
+  cnode03network1interface:
     Type: AWS::EC2::NetworkInterface
     Condition: CreateNode03
     Properties:
@@ -530,7 +530,7 @@ Resources:
           Key: "compute_group"
           Value: "default"
 
-  flightcloudclusternode03:
+  cnode03:
     Type: AWS::EC2::Instance
     Condition: CreateNode03
     Properties:
@@ -557,7 +557,7 @@ Resources:
       Monitoring: true
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref flightcloudclusternode03network1interface
+          NetworkInterfaceId: !Ref cnode03network1interface
           DeviceIndex: 0
       UserData: !Ref customdatanode
       BlockDeviceMappings:
@@ -566,7 +566,7 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclusternode04network1interface:
+  cnode04network1interface:
     Type: AWS::EC2::NetworkInterface
     Condition: CreateNode04
     Properties:
@@ -585,7 +585,7 @@ Resources:
           Key: "compute_group"
           Value: "default"
 
-  flightcloudclusternode04:
+  cnode04:
     Type: AWS::EC2::Instance
     Condition: CreateNode04
     Properties:
@@ -612,7 +612,7 @@ Resources:
       Monitoring: true
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref flightcloudclusternode04network1interface
+          NetworkInterfaceId: !Ref cnode04network1interface
           DeviceIndex: 0
       UserData: !Ref customdatanode
       BlockDeviceMappings:
@@ -621,7 +621,7 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclusternode05network1interface:
+  cnode05network1interface:
     Type: AWS::EC2::NetworkInterface
     Condition: CreateNode05
     Properties:
@@ -640,7 +640,7 @@ Resources:
           Key: "compute_group"
           Value: "default"
 
-  flightcloudclusternode05:
+  cnode05:
     Type: AWS::EC2::Instance
     Condition: CreateNode05
     Properties:
@@ -667,7 +667,7 @@ Resources:
       Monitoring: true
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref flightcloudclusternode05network1interface
+          NetworkInterfaceId: !Ref cnode05network1interface
           DeviceIndex: 0
       UserData: !Ref customdatanode
       BlockDeviceMappings:
@@ -676,7 +676,7 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclusternode06network1interface:
+  cnode06network1interface:
     Type: AWS::EC2::NetworkInterface
     Condition: CreateNode06
     Properties:
@@ -695,7 +695,7 @@ Resources:
           Key: "compute_group"
           Value: "default"
 
-  flightcloudclusternode06:
+  cnode06:
     Type: AWS::EC2::Instance
     Condition: CreateNode06
     Properties:
@@ -722,7 +722,7 @@ Resources:
       Monitoring: true
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref flightcloudclusternode06network1interface
+          NetworkInterfaceId: !Ref cnode06network1interface
           DeviceIndex: 0
       UserData: !Ref customdatanode
       BlockDeviceMappings:
@@ -731,7 +731,7 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclusternode07network1interface:
+  cnode07network1interface:
     Type: AWS::EC2::NetworkInterface
     Condition: CreateNode07
     Properties:
@@ -750,7 +750,7 @@ Resources:
           Key: "compute_group"
           Value: "default"
 
-  flightcloudclusternode07:
+  cnode07:
     Type: AWS::EC2::Instance
     Condition: CreateNode07
     Properties:
@@ -777,7 +777,7 @@ Resources:
       Monitoring: true
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref flightcloudclusternode07network1interface
+          NetworkInterfaceId: !Ref cnode07network1interface
           DeviceIndex: 0
       UserData: !Ref customdatanode
       BlockDeviceMappings:
@@ -786,7 +786,7 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  flightcloudclusternode08network1interface:
+  cnode08network1interface:
     Type: AWS::EC2::NetworkInterface
     Condition: CreateNode08
     Properties:
@@ -805,7 +805,7 @@ Resources:
           Key: "compute_group"
           Value: "default"
 
-  flightcloudclusternode08:
+  cnode08:
     Type: AWS::EC2::Instance
     Condition: CreateNode08
     Properties:
@@ -832,7 +832,7 @@ Resources:
       Monitoring: true
       NetworkInterfaces:
         -
-          NetworkInterfaceId: !Ref flightcloudclusternode08network1interface
+          NetworkInterfaceId: !Ref cnode08network1interface
           DeviceIndex: 0
       UserData: !Ref customdatanode
       BlockDeviceMappings:

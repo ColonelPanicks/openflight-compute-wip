@@ -15,7 +15,7 @@ fi
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 function check_up {
-    IP=$(grep '^gateway1' /opt/flight/clusters/$cluster |sed 's/.*ansible_host=//g')
+    IP=$(grep '^chead1' /opt/flight/clusters/$cluster |sed 's/.*ansible_host=//g')
     if ! ssh -q -o ConnectTimeout=1 -o ConnectionAttempts=1 $IP exit > /dev/null; then
         echo "Cannot connect to $IP for SSH, presuming destroyed"
         rm -f /opt/flight/clusters/$cluster
@@ -23,6 +23,6 @@ function check_up {
 }
 
 for cluster in $(ls /opt/flight/clusters) ; do
-    echo "Checking if $cluster gateway1 is up/reachable"
+    echo "Checking if $cluster chead1 is up/reachable"
     check_up
 done
