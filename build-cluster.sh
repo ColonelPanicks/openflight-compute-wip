@@ -37,7 +37,7 @@ LOG="$DIR/log/deploy.log"
 SEED=$(head /dev/urandom | tr -dc a-z0-9 | head -c 6 ; echo '')
 CLUSTERNAME="$CLUSTERNAMEARG-$SEED"
 
-GATEWAYIP="Unknown"
+CHEADIP="Unknown"
 
 #################
 # Checking Args #
@@ -167,17 +167,17 @@ function deploy_azure() {
         customdatagw="$CUSTOMDATAGW" \
         customdatanode="$CUSTOMDATANODE" 
 
-    GATEWAYIP=$(az network public-ip show -g $CLUSTERNAME -n chead1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
+    CHEADIP=$(az network public-ip show -g $CLUSTERNAME -n chead1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
 
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
     cat << EOF > /opt/flight/clusters/$CLUSTERNAME
 [gateway]
-chead1    ansible_host=$GATEWAYIP
+chead1    ansible_host=$CHEADIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
-echo "cnode0$i    ansible_host=$(az vm list-ip-addresses -g $CLUSTERNAME -n cnode0$i --query [?virtualMachine].virtualMachine.network.privateIpAddresses --output tsv) ansible_ssh_common_args='-J $GATEWAYIP'"
+echo "cnode0$i    ansible_host=$(az vm list-ip-addresses -g $CLUSTERNAME -n cnode0$i --query [?virtualMachine].virtualMachine.network.privateIpAddresses --output tsv) ansible_ssh_common_args='-J $CHEADIP'"
 i=$((i + 1))
 done)
 EOF
@@ -220,17 +220,17 @@ function deploy_aws() {
 
     aws cloudformation wait stack-create-complete --stack-name $CLUSTERNAME --region "$AWS_LOCATION"
 
-    GATEWAYIP=$(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id chead1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
+    CHEADIP=$(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id chead1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
 
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
     cat << EOF > /opt/flight/clusters/$CLUSTERNAME
 [gateway]
-chead1    ansible_host=$GATEWAYIP
+chead1    ansible_host=$CHEADIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
-echo "cnode0$i    ansible_host=$(aws ec2 describe-instances --region "$AWS_LOCATION" --instance-ids $(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id cnode0$i --query 'StackResources[].PhysicalResourceId' --output text) --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text) ansible_ssh_common_args='-J $GATEWAYIP'"
+echo "cnode0$i    ansible_host=$(aws ec2 describe-instances --region "$AWS_LOCATION" --instance-ids $(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id cnode0$i --query 'StackResources[].PhysicalResourceId' --output text) --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text) ansible_ssh_common_args='-J $CHEADIP'"
 i=$((i + 1))
 done)
 EOF
@@ -316,4 +316,4 @@ case $PLATFORM in
 esac
 
 
-echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | End Deploy | Gateway1 IP: $GATEWAYIP" |tee -a $LOG
+echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | End Deploy | chead1 IP: $CHEADIP" |tee -a $LOG
