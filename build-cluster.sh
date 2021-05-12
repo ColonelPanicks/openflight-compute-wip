@@ -112,6 +112,7 @@ EOF
     GW=$(cat << EOF
 $(echo "$DATA")
   - firewall-cmd --add-rich-rule='rule family="ipv4" source address="10.10.0.0/255.255.0.0" masquerade' --permanent
+  - firewall-cmd --set-target=ACCEPT --permanent
   - firewall-cmd --reload
   - echo "net.ipv4.ip_forward = 1" > /etc/sysctl.conf
   - echo 1 > /proc/sys/net/ipv4/ip_forward
