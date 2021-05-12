@@ -126,6 +126,7 @@ $(echo "$DATA")
   - grep -q "PEERDNS" /etc/sysconfig/network-scripts/ifcfg-eth0 && sed -i 's/PEERDNS=*/PEERDNS=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "PEERDNS=yes" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
   - grep -q "PEERROUTES" /etc/sysconfig/network-scripts/ifcfg-eth0 && sed -i 's/PEERROUTES=*/PEERROUTES=no/g' /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "PEERROUTES=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
   - systemctl restart network
+  - grep -q "$CLUSTERNAMEARG" /etc/resolv.conf || sed -ri 's/^search (.*?)( pri.$CLUSTERNAMEARG.cluster.local|$)/search \1 pri.$CLUSTERNAMEARG.cluster.local/' /etc/resolv.conf
 EOF
 )
 
