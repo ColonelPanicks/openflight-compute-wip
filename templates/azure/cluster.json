@@ -158,7 +158,10 @@
         "dnsSettings": {
           "domainNameLabel": "[concat('chead1-', parameters('clustername'))]"
         }
-      }
+      },
+      "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
+        ]
     },
     {
       "type": "Microsoft.Network/networkInterfaces",
@@ -274,7 +277,10 @@
         "networkSecurityGroup": {
           "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
         }
-      }
+      },
+      "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
+        ]
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
