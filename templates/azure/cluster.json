@@ -274,10 +274,7 @@
         "networkSecurityGroup": {
           "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
         }
-      },
-      "dependsOn": [
-        "pubLoop"
-      ]
+      }
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
