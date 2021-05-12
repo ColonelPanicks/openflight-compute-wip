@@ -228,7 +228,7 @@ gateway1    ansible_host=$GATEWAYIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
-echo "node0$i    ansible_host=$(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id flightcloudclusternode0$i\pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")"
+echo "node0$i    ansible_host=$(aws ec2 describe-instances --instance-ids $(aws cloudformation describe-stack-resources --region "eu-west-2" --stack-name ben2-ikvt04 --logical-resource-id flightcloudclusternode01 --query 'StackResources[].PhysicalResourceId' --output text) --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text) ansible_ssh_common_args='-J $GATEWAYIP'"
 i=$((i + 1))
 done)
 EOF
@@ -249,11 +249,12 @@ function set_hostnames() {
     while IFS= read -r node ; do
         name=$(echo "$node" |awk '{print $1}')
         ip=$(echo "$node" |awk '{print $2}' |sed 's/.*ansible_host=//g')
+        ssh_args=$(echo "$node" |awk '{print $3,$4}' |sed "s/.*ansible_ssh_common_args=//g;s/'//g")
 
-        until ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ip exit </dev/null 2>/dev/null ; do
+        until ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ssh_args $ip exit </dev/null 2>/dev/null ; do
             sleep 5
         done
-        ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ip "hostnamectl set-hostname $name.pri.$CLUSTERNAMEARG.cluster.local" </dev/null
+        ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ssh_args $ip "hostnamectl set-hostname $name.pri.$CLUSTERNAMEARG.cluster.local" </dev/null
     done <<< "$(echo "$NODES")"
 }
 
