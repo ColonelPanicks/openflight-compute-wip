@@ -37,7 +37,7 @@ LOG="$DIR/log/deploy.log"
 SEED=$(head /dev/urandom | tr -dc a-z0-9 | head -c 6 ; echo '')
 CLUSTERNAME="$CLUSTERNAMEARG-$SEED"
 
-GATEWAYIP="Unknown"
+CHEADIP="Unknown"
 
 #################
 # Checking Args #
@@ -104,12 +104,35 @@ echo "  - echo "$PASSWORD" | passwd --stdin flight"
 echo "  - sed -i 's/^PasswordAuthentication .*/PasswordAuthentication yes/g' /etc/ssh/sshd_config"
 echo "  - systemctl restart sshd"
 fi)
-  - systemctl disable firewalld && systemctl stop firewalld
   - timedatectl set-timezone Europe/London
   - grep -q "$CLUSTERNAMEARG" /etc/resolv.conf || sed -ri 's/^search (.*?)( pri.$CLUSTERNAMEARG.cluster.local|$)/search \1 pri.$CLUSTERNAMEARG.cluster.local/' /etc/resolv.conf
 EOF
 )
-    CUSTOMDATA=$(echo "$DATA" |base64 -w 0)
+
+    GW=$(cat << EOF
+$(echo "$DATA")
+  - firewall-cmd --add-rich-rule='rule family="ipv4" source address="10.10.0.0/255.255.0.0" masquerade' --permanent
+  - firewall-cmd --set-target=ACCEPT --permanent
+  - firewall-cmd --reload
+  - echo "net.ipv4.ip_forward = 1" > /etc/sysctl.conf
+  - echo 1 > /proc/sys/net/ipv4/ip_forward
+EOF
+)
+
+    NODE=$(cat << EOF
+$(echo "$DATA")
+  - systemctl disable firewalld && systemctl stop firewalld
+  - grep -q "NM_CONTROLLED" /etc/sysconfig/network-scripts/ifcfg-eth0 && sed -i 's/NM_CONTROLLED=*/NM_CONTROLLED=no/g' /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "NM_CONTROLLED=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
+  - grep -q "GATEWAY" /etc/sysconfig/network-scripts/ifcfg-eth0 && sed -i 's/GATEWAY=*/GATEWAY=10.10.0.11/g' /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "GATEWAY=10.10.0.11" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
+  - grep -q "PEERDNS" /etc/sysconfig/network-scripts/ifcfg-eth0 && sed -i 's/PEERDNS=*/PEERDNS=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "PEERDNS=yes" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
+  - grep -q "PEERROUTES" /etc/sysconfig/network-scripts/ifcfg-eth0 && sed -i 's/PEERROUTES=*/PEERROUTES=no/g' /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "PEERROUTES=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
+  - systemctl restart network
+  - grep -q "$CLUSTERNAMEARG" /etc/resolv.conf || sed -ri 's/^search (.*?)( pri.$CLUSTERNAMEARG.cluster.local|$)/search \1 pri.$CLUSTERNAMEARG.cluster.local/' /etc/resolv.conf
+EOF
+)
+
+    CUSTOMDATAGW=$(echo "$GW" |base64 -w 0)
+    CUSTOMDATANODE=$(echo "$NODE" |base64 -w 0)
 }
 
 function check_azure() {
@@ -139,21 +162,22 @@ function deploy_azure() {
         --parameters sourceimage="$AZURE_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
-        gatewayinstancetype="$AZURE_GATEWAYINSTANCE" \
+        cheadinstancetype="$AZURE_GATEWAYINSTANCE" \
         computeinstancetype="$AZURE_COMPUTEINSTANCE" \
-        customdata="$CUSTOMDATA"
+        customdatagw="$CUSTOMDATAGW" \
+        customdatanode="$CUSTOMDATANODE" 
 
-    GATEWAYIP=$(az network public-ip show -g $CLUSTERNAME -n flightcloudclustergateway1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
+    CHEADIP=$(az network public-ip show -g $CLUSTERNAME -n chead1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
 
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
     cat << EOF > /opt/flight/clusters/$CLUSTERNAME
 [gateway]
-gateway1    ansible_host=$GATEWAYIP
+chead1    ansible_host=$CHEADIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
-echo "node0$i    ansible_host=$(az network public-ip show -g $CLUSTERNAME -n flightcloudclusternode0$i\pubIP --query '{address: ipAddress}' --output yaml |awk '{print $2}')"
+echo "cnode0$i    ansible_host=$(az vm list-ip-addresses -g $CLUSTERNAME -n cnode0$i --query [?virtualMachine].virtualMachine.network.privateIpAddresses --output tsv) ansible_ssh_common_args='-J $CHEADIP'"
 i=$((i + 1))
 done)
 EOF
@@ -189,22 +213,24 @@ function deploy_aws() {
         --parameter-overrides sourceimage="$AWS_SOURCEIMAGE" \
         clustername="$CLUSTERNAMEARG" \
         computeNodesCount="$COMPUTENODES" \
-        gatewayinstancetype="$AWS_GATEWAYINSTANCE" \
+        cheadinstancetype="$AWS_GATEWAYINSTANCE" \
         computeinstancetype="$AWS_COMPUTEINSTANCE" \
-        customdata="$CUSTOMDATA"
+        customdatagw="$CUSTOMDATAGW" \
+        customdatanode="$CUSTOMDATANODE" 
+
     aws cloudformation wait stack-create-complete --stack-name $CLUSTERNAME --region "$AWS_LOCATION"
 
-    GATEWAYIP=$(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id flightcloudclustergateway1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
+    CHEADIP=$(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id chead1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
 
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
     cat << EOF > /opt/flight/clusters/$CLUSTERNAME
 [gateway]
-gateway1    ansible_host=$GATEWAYIP
+chead1    ansible_host=$CHEADIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
-echo "node0$i    ansible_host=$(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id flightcloudclusternode0$i\pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")"
+echo "cnode0$i    ansible_host=$(aws ec2 describe-instances --region "$AWS_LOCATION" --instance-ids $(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id cnode0$i --query 'StackResources[].PhysicalResourceId' --output text) --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text) ansible_ssh_common_args='-J $CHEADIP'"
 i=$((i + 1))
 done)
 EOF
@@ -225,11 +251,12 @@ function set_hostnames() {
     while IFS= read -r node ; do
         name=$(echo "$node" |awk '{print $1}')
         ip=$(echo "$node" |awk '{print $2}' |sed 's/.*ansible_host=//g')
+        ssh_args=$(echo "$node" |awk '{print $3,$4}' |sed "s/.*ansible_ssh_common_args=//g;s/'//g")
 
-        until ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ip exit </dev/null 2>/dev/null ; do
+        until ssh -q -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ssh_args $ip exit </dev/null 2>/dev/null ; do
             sleep 5
         done
-        ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ip "hostnamectl set-hostname $name.pri.$CLUSTERNAMEARG.cluster.local" </dev/null
+        ssh -q -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ssh_args $ip "hostnamectl set-hostname $name.pri.$CLUSTERNAMEARG.cluster.local" </dev/null
     done <<< "$(echo "$NODES")"
 }
 
@@ -247,7 +274,7 @@ function run_ansible() {
     # Run ansible playbook
     cd $ANSIBLE_PLAYBOOK_DIR
     export ANSIBLE_HOST_KEY_CHECKING=false
-    ARGS="cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=node[01-0$COMPUTENODES] $flightenv_dev_var $flightenv_bootstrap_var"
+    ARGS="cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=cnode[01-0$COMPUTENODES] $flightenv_dev_var $flightenv_bootstrap_var"
     echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Ansible | ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars \"$ARGS\" openflight.yml" |tee -a $LOG
     ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "$ARGS" openflight.yml
 }
@@ -289,4 +316,4 @@ case $PLATFORM in
 esac
 
 
-echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | End Deploy | Gateway1 IP: $GATEWAYIP" |tee -a $LOG
+echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | End Deploy | chead1 IP: $CHEADIP" |tee -a $LOG

@@ -14,17 +14,23 @@
               "description": "Name of the cluster"
           }
       },
-      "customdata": {
+      "customdatagw": {
           "type": "string",
           "metadata": {
-              "description": "Cloud-init customdata for all systems encoded in base64"
+              "description": "Cloud-init customdata for chead encoded in base64"
           }
       },
-      "gatewayinstancetype": {
+      "customdatanode": {
+          "type": "string",
+          "metadata": {
+              "description": "Cloud-init customdata for cnodes encoded in base64"
+          }
+      },
+      "cheadinstancetype": {
           "type": "string",
           "defaultValue": "Standard_DS1_v2",
           "metadata": {
-              "description": "Instance type to use for gateway node"
+              "description": "Instance type to use for chead node"
           }
       },
       "computeinstancetype": {
@@ -53,6 +59,10 @@
       "name": "flightcloudclusternetwork",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "core": "true"
+      },
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
@@ -74,6 +84,10 @@
       "name": "flightcloudclustersecuritygroup",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "core": "true"
+      },
       "properties": {
         "securityRules": [{
            "name": "inbound-ssh",
@@ -127,33 +141,42 @@
              "direction": "Inbound"
            }
          }]
-       }
+      }
     },
     {
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "flightcloudclustergateway1pubIP",
+      "name": "chead1pubIP",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "core": "true"
+      },
       "properties": {
         "publicIPAllocationMethod": "Static",
         "idleTimeoutInMinutes": 30,
         "dnsSettings": {
-          "domainNameLabel": "[concat('gateway1-', parameters('clustername'))]"
+          "domainNameLabel": "[concat('chead1-', parameters('clustername'))]"
         }
       }
     },
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "flightcloudclustergateway1network1interface",
+      "name": "chead1network1interface",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "core": "true"
+      },
       "properties": {
         "ipConfigurations": [{
-          "name": "flightcloudclustergateway1network1ip",
+          "name": "chead1network1ip",
           "properties": {
-            "privateIPAllocationMethod": "Dynamic",
+            "privateIPAllocationMethod": "Static",
+            "privateIPAddress": "10.10.0.11",
             "publicIPAddress": {
-              "id": "[resourceId('Microsoft.Network/publicIpAddresses', 'flightcloudclustergateway1pubIP')]"
+              "id": "[resourceId('Microsoft.Network/publicIpAddresses', 'chead1pubIP')]"
             },
             "subnet": {
               "id": "[variables('subnet1Ref')]"
@@ -165,17 +188,21 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIpAddresses', 'flightcloudclustergateway1pubIP')]"
+        "[resourceId('Microsoft.Network/publicIpAddresses', 'chead1pubIP')]"
       ]
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "flightcloudclustergateway1",
+      "name": "chead1",
       "apiVersion": "2016-04-30-preview",
       "location": "[resourceGroup().location]",
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "core": "true"
+      },
       "properties": {
         "hardwareProfile": {
-              "vmSize": "[parameters('gatewayinstancetype')]"
+              "vmSize": "[parameters('cheadinstancetype')]"
             },
         "storageProfile": {
           "osDisk": {
@@ -189,10 +216,10 @@
           }
         },
         "osProfile": {
-          "computerName": "[concat('gateway1.pri.', parameters('clustername'), '.cluster.local')]",
+          "computerName": "[concat('chead1.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
           "adminPassword": "OpenFlightPlaceholderPassword",
-          "customdata": "[parameters('customdata')]",
+          "customdata": "[parameters('customdatagw')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
@@ -208,7 +235,7 @@
         "networkProfile": {
           "networkInterfaces": [
           {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'flightcloudclustergateway1network1interface')]",
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'chead1network1interface')]",
                 "properties": {
                   "primary": true
                 }
@@ -217,43 +244,28 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', 'flightcloudclustergateway1network1interface')]"
+        "[resourceId('Microsoft.Network/networkInterfaces', 'chead1network1interface')]"
       ]
     },
     {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat('flightcloudclusternode0', copyindex(1), 'pubIP')]",
-      "apiVersion": "2017-03-01",
-      "location": "[resourceGroup().location]",
-      "copy": {
-          "name": "pubLoop",
-          "count": "[parameters('computeNodesCount')]"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "Static",
-        "idleTimeoutInMinutes": 30,
-        "dnsSettings": {
-          "domainNameLabel": "[concat('node0', copyindex(1), '-', parameters('clustername'))]"
-        }
-      }
-    },
-    {
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat('flightcloudclusternode0', copyindex(1), 'network1interface')]",
+      "name": "[concat('cnode0', copyindex(1), 'network1interface')]",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
       "copy": {
           "name": "nicLoop",
           "count": "[parameters('computeNodesCount')]"
       },
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "compute": "true",
+          "compute_group": "default"
+      },
       "properties": {
         "ipConfigurations": [{
-          "name": "[concat('flightcloudclusternode0', copyindex(1), 'network1ip')]",
+          "name": "[concat('cnode0', copyindex(1), 'network1ip')]",
           "properties": {
             "privateIPAllocationMethod": "Dynamic",
-            "publicIPAddress": {
-              "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat('flightcloudclusternode0', copyindex(1), 'pubIP'))]"
-            },
             "subnet": {
               "id": "[variables('subnet1Ref')]"
             }
@@ -262,19 +274,21 @@
         "networkSecurityGroup": {
           "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
         }
-      },
-      "dependsOn": [
-        "pubLoop"
-      ]
+      }
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat('flightcloudclusternode0', copyindex(1))]",
+      "name": "[concat('cnode0', copyindex(1))]",
       "apiVersion": "2016-04-30-preview",
       "location": "[resourceGroup().location]",
       "copy": {
           "name": "computeLoop",
           "count": "[parameters('computeNodesCount')]"
+      },
+      "tags": {
+          "project": "[parameters('clustername')]",
+          "compute": "true",
+          "compute_group": "default"
       },
       "properties": {
         "hardwareProfile": {
@@ -292,10 +306,10 @@
           }
         },
           "osProfile": {
-          "computerName": "[concat('node0', copyindex(1), '.pri.', parameters('clustername'), '.cluster.local')]",
+          "computerName": "[concat('cnode0', copyindex(1), '.pri.', parameters('clustername'), '.cluster.local')]",
           "adminUsername": "flight",
           "adminPassword": "OpenFlightPlaceholderPassword",
-          "customdata": "[parameters('customdata')]",
+          "customdata": "[parameters('customdatanode')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
@@ -311,7 +325,7 @@
         "networkProfile": {
           "networkInterfaces": [
           {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('flightcloudclusternode0', copyindex(1), 'network1interface'))]",
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('cnode0', copyindex(1), 'network1interface'))]",
                 "properties": {
                   "primary": true
                 }
