@@ -177,7 +177,7 @@ gateway1    ansible_host=$GATEWAYIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
-echo "node0$i    ansible_host=$(az network public-ip show -g $CLUSTERNAME -n flightcloudclusternode0$i\pubIP --query '{address: ipAddress}' --output yaml |awk '{print $2}')"
+echo "node0$i    ansible_host=$(az vm list-ip-addresses -g $CLUSTERNAME -n flightcloudclusternode0$i --query [?virtualMachine].virtualMachine.network.privateIpAddresses --output tsv) ansible_ssh_common_args='-J $GATEWAYIP'"
 i=$((i + 1))
 done)
 EOF
