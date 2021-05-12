@@ -228,7 +228,7 @@ gateway1    ansible_host=$GATEWAYIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
-echo "node0$i    ansible_host=$(aws ec2 describe-instances --instance-ids $(aws cloudformation describe-stack-resources --region "eu-west-2" --stack-name $CLUSTERNAME --logical-resource-id flightcloudclusternode0$i --query 'StackResources[].PhysicalResourceId' --output text) --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text) ansible_ssh_common_args='-J $GATEWAYIP'"
+echo "node0$i    ansible_host=$(aws ec2 describe-instances --region "$AWS_LOCATION" --instance-ids $(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id flightcloudclusternode0$i --query 'StackResources[].PhysicalResourceId' --output text) --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text) ansible_ssh_common_args='-J $GATEWAYIP'"
 i=$((i + 1))
 done)
 EOF
