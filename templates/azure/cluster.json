@@ -279,7 +279,8 @@
         }
       },
       "dependsOn": [
-          "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
+          "flightcloudclustersecuritygroup",
+          "chead1network1interface"
         ]
     },
     {
