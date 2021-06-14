@@ -35,7 +35,7 @@ Conditions:
   CreateNode07: !Or [ !Equals [ !Ref computeNodesCount, 7 ], !Equals [ !Ref computeNodesCount, 8 ]]
   CreateNode08: !Equals [ !Ref computeNodesCount, 8 ]
 Resources:
-  flightcloudclusternetwork:
+  flightvpc:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.10.0.0/16
@@ -49,9 +49,9 @@ Resources:
           Key: "core"
           Value: "true"
 
-  flightcloudclusterinternetgateway:
+  flightigw:
     Type: AWS::EC2::InternetGateway
-    DependsOn: flightcloudclusternetwork
+    DependsOn: flightvpc
     Properties:
       Tags:
         -
@@ -61,17 +61,17 @@ Resources:
           Key: "core"
           Value: "true"
 
-  flightcloudclusterinternetgatewayattachment:
+  flightigwattach:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      InternetGatewayId: !Ref flightcloudclusterinternetgateway
-      VpcId: !Ref flightcloudclusternetwork
+      InternetGatewayId: !Ref flightigw
+      VpcId: !Ref flightvpc
 
-  flightcloudclusterroutetable:
+  flightrt1:
     Type: AWS::EC2::RouteTable
-    DependsOn: flightcloudclusterinternetgatewayattachment
+    DependsOn: flightigwattach
     Properties:
-      VpcId: !Ref flightcloudclusternetwork
+      VpcId: !Ref flightvpc
       Tags:
         -
           Key: "project"
@@ -80,10 +80,10 @@ Resources:
           Key: "core"
           Value: "true"
 
-  flightcloudclusterroutetable2:
+  flightrt2:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref flightcloudclusternetwork
+      VpcId: !Ref flightvpc
       Tags:
         -
           Key: "project"
@@ -92,11 +92,11 @@ Resources:
           Key: "core"
           Value: "true"
 
-  flightcloudclusternetwork1:
+  flightsub1:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: 10.10.0.0/24
-      VpcId: !Ref flightcloudclusternetwork
+      VpcId: !Ref flightvpc
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -108,11 +108,11 @@ Resources:
           Key: "core"
           Value: "true"
 
-  flightcloudclusternetwork2:
+  flightsub2:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: 10.10.1.0/24
-      VpcId: !Ref flightcloudclusternetwork
+      VpcId: !Ref flightvpc
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -124,40 +124,40 @@ Resources:
           Key: "core"
           Value: "true"
 
-  flightcloudclusternetwork1subnetroutetableassocation:
+  flightsub1rt1assocation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref flightcloudclusternetwork1
-      RouteTableId: !Ref flightcloudclusterroutetable
+      SubnetId: !Ref flightsub1
+      RouteTableId: !Ref flightrt1
 
-  flightcloudclusternetwork1subnetroutetableassocation2:
+  flightsub2rt2assocation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref flightcloudclusternetwork2
-      RouteTableId: !Ref flightcloudclusterroutetable2
+      SubnetId: !Ref flightsub2
+      RouteTableId: !Ref flightrt2
 
-  flightcloudclusterrouteinternetgateway:
+  flightsub1gwroute:
     Type: AWS::EC2::Route
-    DependsOn: flightcloudclusterinternetgatewayattachment
+    DependsOn: flightigwattach
     Properties:
-      RouteTableId: !Ref flightcloudclusterroutetable
+      RouteTableId: !Ref flightrt1
       DestinationCidrBlock: '0.0.0.0/0'
-      GatewayId: !Ref flightcloudclusterinternetgateway
+      GatewayId: !Ref flightigw
 
-  flightcloudclusterrouteinternetgateway2:
+  flightsub2gwroute:
     Type: AWS::EC2::Route
     DependsOn: chead1
     Properties:
-      RouteTableId: !Ref flightcloudclusterroutetable2
+      RouteTableId: !Ref flightrt2
       DestinationCidrBlock: '0.0.0.0/0'
       InstanceId: !Ref chead1
 
-  flightcloudclustersecuritygroup:
+  flightsg:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: flightcloudcluster
       GroupDescription: 'Primary SG for basic'
-      VpcId: !Ref flightcloudclusternetwork
+      VpcId: !Ref flightvpc
       SecurityGroupIngress:
         -
           IpProtocol: '-1'
@@ -210,9 +210,9 @@ Resources:
           Key: "core"
           Value: "true"
 
-  flightcloudclusterprivatedns:
+  flightdns:
     Type: AWS::Route53::HostedZone
-    DependsOn: flightcloudclusternetwork
+    DependsOn: flightvpc
     Properties:
       HostedZoneConfig:
         Comment: "Private DNS for a flightcloudcluster"
@@ -220,7 +220,7 @@ Resources:
         - "pri.${cn}.cluster.local"
         - { cn: !Ref clustername }
       VPCs:
-      - VPCId: !Ref flightcloudclusternetwork
+      - VPCId: !Ref flightvpc
         VPCRegion: !Ref 'AWS::Region'
       HostedZoneTags:
         -
@@ -232,7 +232,7 @@ Resources:
 
   dnschead1:
     Type: AWS::Route53::RecordSet
-    DependsOn: flightcloudclusterprivatedns
+    DependsOn: flightdns
     Properties:
       HostedZoneName: !Sub
         - "pri.${cn}.cluster.local."
@@ -248,7 +248,7 @@ Resources:
 
   dnscnode01:
     Type: AWS::Route53::RecordSet
-    DependsOn: flightcloudclusterprivatedns
+    DependsOn: flightdns
     Properties:
       HostedZoneName: !Sub
         - "pri.${cn}.cluster.local."
@@ -264,7 +264,7 @@ Resources:
 
   dnscnode02:
     Type: AWS::Route53::RecordSet
-    DependsOn: flightcloudclusterprivatedns
+    DependsOn: flightdns
     Properties:
       HostedZoneName: !Sub
         - "pri.${cn}.cluster.local."
@@ -281,7 +281,7 @@ Resources:
   dnscnode03:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode03
-    DependsOn: flightcloudclusterprivatedns
+    DependsOn: flightdns
     Properties:
       HostedZoneName: !Sub
         - "pri.${cn}.cluster.local."
@@ -298,7 +298,7 @@ Resources:
   dnscnode04:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode04
-    DependsOn: flightcloudclusterprivatedns
+    DependsOn: flightdns
     Properties:
       HostedZoneName: !Sub
         - "pri.${cn}.cluster.local."
@@ -315,7 +315,7 @@ Resources:
   dnscnode05:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode05
-    DependsOn: flightcloudclusterprivatedns
+    DependsOn: flightdns
     Properties:
       HostedZoneName: !Sub
         - "pri.${cn}.cluster.local."
@@ -332,7 +332,7 @@ Resources:
   dnscnode06:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode06
-    DependsOn: flightcloudclusterprivatedns
+    DependsOn: flightdns
     Properties:
       HostedZoneName: !Sub
         - "pri.${cn}.cluster.local."
@@ -349,7 +349,7 @@ Resources:
   dnscnode07:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode07
-    DependsOn: flightcloudclusterprivatedns
+    DependsOn: flightdns
     Properties:
       HostedZoneName: !Sub
         - "pri.${cn}.cluster.local."
@@ -366,7 +366,7 @@ Resources:
   dnscnode08:
     Type: AWS::Route53::RecordSet
     Condition: CreateNode08
-    DependsOn: flightcloudclusterprivatedns
+    DependsOn: flightdns
     Properties:
       HostedZoneName: !Sub
         - "pri.${cn}.cluster.local."
@@ -385,8 +385,8 @@ Resources:
     Properties:
       SourceDestCheck: false
       GroupSet:
-        - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork1
+        - !Ref flightsg
+      SubnetId: !Ref flightsub1
       PrivateIpAddress: 10.10.0.11
       Tags:
         -
@@ -452,8 +452,8 @@ Resources:
     Properties:
       SourceDestCheck: false
       GroupSet:
-        - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork2
+        - !Ref flightsg
+      SubnetId: !Ref flightsub2
       Tags:
         -
           Key: "project"
@@ -506,8 +506,8 @@ Resources:
     Properties:
       SourceDestCheck: false
       GroupSet:
-        - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork2
+        - !Ref flightsg
+      SubnetId: !Ref flightsub2
       Tags:
         -
           Key: "project"
@@ -561,8 +561,8 @@ Resources:
     Properties:
       SourceDestCheck: false
       GroupSet:
-        - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork2
+        - !Ref flightsg
+      SubnetId: !Ref flightsub2
       Tags:
         -
           Key: "project"
@@ -616,8 +616,8 @@ Resources:
     Properties:
       SourceDestCheck: false
       GroupSet:
-        - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork2
+        - !Ref flightsg
+      SubnetId: !Ref flightsub2
       Tags:
         -
           Key: "project"
@@ -671,8 +671,8 @@ Resources:
     Properties:
       SourceDestCheck: false
       GroupSet:
-        - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork2
+        - !Ref flightsg
+      SubnetId: !Ref flightsub2
       Tags:
         -
           Key: "project"
@@ -726,8 +726,8 @@ Resources:
     Properties:
       SourceDestCheck: false
       GroupSet:
-        - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork2
+        - !Ref flightsg
+      SubnetId: !Ref flightsub2
       Tags:
         -
           Key: "project"
@@ -781,8 +781,8 @@ Resources:
     Properties:
       SourceDestCheck: false
       GroupSet:
-        - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork2
+        - !Ref flightsg
+      SubnetId: !Ref flightsub2
       Tags:
         -
           Key: "project"
@@ -836,8 +836,8 @@ Resources:
     Properties:
       SourceDestCheck: false
       GroupSet:
-        - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork2
+        - !Ref flightsg
+      SubnetId: !Ref flightsub2
       Tags:
         -
           Key: "project"
