@@ -13,7 +13,7 @@ Parameters:
   customdatanode:
     Type: String
     Description: 'Cloud-init customdata for cnodes encoded in base64'
-  computeNodesCount: 
+  computeNodesCount:
     Type: Number
     Default: 2
     MinValue: 2
@@ -42,10 +42,10 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "core"
           Value: "true"
 
@@ -54,10 +54,10 @@ Resources:
     DependsOn: flightcloudclusternetwork
     Properties:
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "core"
           Value: "true"
 
@@ -73,26 +73,54 @@ Resources:
     Properties:
       VpcId: !Ref flightcloudclusternetwork
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
+          Key: "core"
+          Value: "true"
+
+  flightcloudclusterroutetable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref flightcloudclusternetwork
+      Tags:
+        -
+          Key: "project"
+          Value: !Ref clustername
+        -
           Key: "core"
           Value: "true"
 
   flightcloudclusternetwork1:
     Type: AWS::EC2::Subnet
     Properties:
-      CidrBlock: 10.10.0.0/19
+      CidrBlock: 10.10.0.0/24
       VpcId: !Ref flightcloudclusternetwork
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
+          Key: "core"
+          Value: "true"
+
+  flightcloudclusternetwork2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.10.1.0/24
+      VpcId: !Ref flightcloudclusternetwork
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        -
+          Key: "project"
+          Value: !Ref clustername
+        -
           Key: "core"
           Value: "true"
 
@@ -102,6 +130,12 @@ Resources:
       SubnetId: !Ref flightcloudclusternetwork1
       RouteTableId: !Ref flightcloudclusterroutetable
 
+  flightcloudclusternetwork1subnetroutetableassocation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref flightcloudclusternetwork2
+      RouteTableId: !Ref flightcloudclusterroutetable2
+
   flightcloudclusterrouteinternetgateway:
     Type: AWS::EC2::Route
     DependsOn: flightcloudclusterinternetgatewayattachment
@@ -109,6 +143,14 @@ Resources:
       RouteTableId: !Ref flightcloudclusterroutetable
       DestinationCidrBlock: '0.0.0.0/0'
       GatewayId: !Ref flightcloudclusterinternetgateway
+
+  flightcloudclusterrouteinternetgateway2:
+    Type: AWS::EC2::Route
+    DependsOn: chead1
+    Properties:
+      RouteTableId: !Ref flightcloudclusterroutetable2
+      DestinationCidrBlock: '0.0.0.0/0'
+      InstanceId: !Ref chead1
 
   flightcloudclustersecuritygroup:
     Type: AWS::EC2::SecurityGroup
@@ -161,10 +203,10 @@ Resources:
           CidrIp: '0.0.0.0/0'
           Description: 'Allow outbound internet access'
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "core"
           Value: "true"
 
@@ -181,10 +223,10 @@ Resources:
       - VPCId: !Ref flightcloudclusternetwork
         VPCRegion: !Ref 'AWS::Region'
       HostedZoneTags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "core"
           Value: "true"
 
@@ -347,10 +389,10 @@ Resources:
       SubnetId: !Ref flightcloudclusternetwork1
       PrivateIpAddress: 10.10.0.11
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "core"
           Value: "true"
 
@@ -364,10 +406,10 @@ Resources:
           Value: !Sub
            - "${cn}_chead1"
            - { cn: !Ref clustername }
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "core"
           Value: "true"
       AvailabilityZone: !Select
@@ -387,15 +429,15 @@ Resources:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
 
-  chead1pubIP: 
+  chead1pubIP:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "core"
           Value: "true"
 
@@ -411,12 +453,12 @@ Resources:
       SourceDestCheck: false
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork1
+      SubnetId: !Ref flightcloudclusternetwork2
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -425,6 +467,7 @@ Resources:
 
   cnode01:
     Type: AWS::EC2::Instance
+    DependsOn: chead1
     Properties:
       Tags:
         -
@@ -432,10 +475,10 @@ Resources:
           Value: !Sub
            - "${cn}_node01"
            - { cn: !Ref clustername }
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -464,12 +507,12 @@ Resources:
       SourceDestCheck: false
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork1
+      SubnetId: !Ref flightcloudclusternetwork2
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -478,6 +521,7 @@ Resources:
 
   cnode02:
     Type: AWS::EC2::Instance
+    DependsOn: chead1
     Properties:
       Tags:
         -
@@ -485,10 +529,10 @@ Resources:
           Value: !Sub
            - "${cn}_node02"
            - { cn: !Ref clustername }
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -518,12 +562,12 @@ Resources:
       SourceDestCheck: false
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork1
+      SubnetId: !Ref flightcloudclusternetwork2
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -540,10 +584,10 @@ Resources:
           Value: !Sub
            - "${cn}_node03"
            - { cn: !Ref clustername }
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -573,12 +617,12 @@ Resources:
       SourceDestCheck: false
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork1
+      SubnetId: !Ref flightcloudclusternetwork2
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -595,10 +639,10 @@ Resources:
           Value: !Sub
            - "${cn}_node04"
            - { cn: !Ref clustername }
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -628,12 +672,12 @@ Resources:
       SourceDestCheck: false
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork1
+      SubnetId: !Ref flightcloudclusternetwork2
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -650,10 +694,10 @@ Resources:
           Value: !Sub
            - "${cn}_node05"
            - { cn: !Ref clustername }
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -683,12 +727,12 @@ Resources:
       SourceDestCheck: false
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork1
+      SubnetId: !Ref flightcloudclusternetwork2
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -705,10 +749,10 @@ Resources:
           Value: !Sub
            - "${cn}_node06"
            - { cn: !Ref clustername }
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -738,12 +782,12 @@ Resources:
       SourceDestCheck: false
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork1
+      SubnetId: !Ref flightcloudclusternetwork2
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -760,10 +804,10 @@ Resources:
           Value: !Sub
            - "${cn}_node07"
            - { cn: !Ref clustername }
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -793,12 +837,12 @@ Resources:
       SourceDestCheck: false
       GroupSet:
         - !Ref flightcloudclustersecuritygroup
-      SubnetId: !Ref flightcloudclusternetwork1
+      SubnetId: !Ref flightcloudclusternetwork2
       Tags:
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
@@ -815,10 +859,10 @@ Resources:
           Value: !Sub
            - "${cn}_node08"
            - { cn: !Ref clustername }
-        - 
+        -
           Key: "project"
           Value: !Ref clustername
-        - 
+        -
           Key: "compute"
           Value: "true"
         -
