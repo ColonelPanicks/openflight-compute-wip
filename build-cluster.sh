@@ -122,12 +122,6 @@ EOF
     NODE=$(cat << EOF
 $(echo "$DATA")
   - systemctl disable firewalld && systemctl stop firewalld
-  - grep -q "NM_CONTROLLED" /etc/sysconfig/network-scripts/ifcfg-eth0 && sed -i 's/NM_CONTROLLED=*/NM_CONTROLLED=no/g' /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "NM_CONTROLLED=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
-  - grep -q "GATEWAY" /etc/sysconfig/network-scripts/ifcfg-eth0 && sed -i 's/GATEWAY=*/GATEWAY=10.10.0.11/g' /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "GATEWAY=10.10.0.11" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
-  - grep -q "PEERDNS" /etc/sysconfig/network-scripts/ifcfg-eth0 && sed -i 's/PEERDNS=*/PEERDNS=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "PEERDNS=yes" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
-  - grep -q "PEERROUTES" /etc/sysconfig/network-scripts/ifcfg-eth0 && sed -i 's/PEERROUTES=*/PEERROUTES=no/g' /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "PEERROUTES=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
-  - systemctl restart network
-  - grep -q "$CLUSTERNAMEARG" /etc/resolv.conf || sed -ri 's/^search (.*?)( pri.$CLUSTERNAMEARG.cluster.local|$)/search \1 pri.$CLUSTERNAMEARG.cluster.local/' /etc/resolv.conf
 EOF
 )
 
