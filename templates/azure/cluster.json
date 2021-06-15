@@ -51,13 +51,13 @@
       }
   },
   "variables": {
-      "subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightcloudclusternetwork', 'flightcloudclusternetwork1')]",
-      "subnet2Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightcloudclusternetwork', 'flightsub2')]"
+      "subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightnet', 'flightsub1')]",
+      "subnet2Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightnet', 'flightsub2')]"
   },
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "name": "flightcloudclusternetwork",
+      "name": "flightnet",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -72,7 +72,7 @@
         },
         "subnets": [
           {
-            "name": "flightcloudclusternetwork1",
+            "name": "flightsub1",
             "properties": {
               "addressPrefix": "10.10.0.0/24"
             }
@@ -106,7 +106,7 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "flightcloudclustersecuritygroup",
+      "name": "flightsg",
       "apiVersion": "2017-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -185,7 +185,7 @@
         }
       },
       "dependsOn": [
-          "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
+          "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightsg')]"
         ]
     },
     {
@@ -212,7 +212,7 @@
           }
         }],
         "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightsg')]"
         }
       },
       "dependsOn": [
@@ -300,11 +300,11 @@
           }
         }],
         "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightcloudclustersecuritygroup')]"
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'flightsg')]"
         }
       },
       "dependsOn": [
-          "flightcloudclustersecuritygroup",
+          "flightsg",
           "chead1network1interface"
         ]
     },
