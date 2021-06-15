@@ -111,8 +111,9 @@ EOF
 
     GW=$(cat << EOF
 $(echo "$DATA")
-  - firewall-cmd --add-rich-rule='rule family="ipv4" source address="10.10.0.0/255.255.0.0" masquerade' --permanent
-  - firewall-cmd --set-target=ACCEPT --permanent
+  - firewall-cmd --add-rich-rule='rule family="ipv4" source address="10.10.0.0/16" masquerade' --zone public --permanent
+  - firewall-cmd --set-target=ACCEPT --zone public --permanent
+  - firewall-cmd --add-interface eth0 --zone public --permanent
   - firewall-cmd --reload
   - echo "net.ipv4.ip_forward = 1" > /etc/sysctl.conf
   - echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -171,7 +172,7 @@ chead1    ansible_host=$CHEADIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
-echo "cnode0$i    ansible_host=$(az vm list-ip-addresses -g $CLUSTERNAME -n cnode0$i --query [?virtualMachine].virtualMachine.network.privateIpAddresses --output tsv) ansible_ssh_common_args='-J $CHEADIP'"
+echo "cnode0$i    ansible_host=$(az vm list-ip-addresses -g $CLUSTERNAME -n cnode0$i --query [?virtualMachine].virtualMachine.network.privateIpAddresses --output tsv) ansible_ssh_common_args='-o ProxyJump=$CHEADIP'"
 i=$((i + 1))
 done)
 EOF
@@ -224,7 +225,7 @@ chead1    ansible_host=$CHEADIP
 
 [nodes]
 $(i=1 ; while [ $i -le $COMPUTENODES ] ; do
-echo "cnode0$i    ansible_host=$(aws ec2 describe-instances --region "$AWS_LOCATION" --instance-ids $(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id cnode0$i --query 'StackResources[].PhysicalResourceId' --output text) --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text) ansible_ssh_common_args='-J $CHEADIP'"
+echo "cnode0$i    ansible_host=$(aws ec2 describe-instances --region "$AWS_LOCATION" --instance-ids $(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id cnode0$i --query 'StackResources[].PhysicalResourceId' --output text) --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text) ansible_ssh_common_args='-o ProxyJump=$CHEADIP'"
 i=$((i + 1))
 done)
 EOF
@@ -250,7 +251,7 @@ function set_hostnames() {
         until ssh -q -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ssh_args $ip exit </dev/null 2>/dev/null ; do
             sleep 5
         done
-        ssh -q -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ssh_args $ip "hostnamectl set-hostname $name.pri.$CLUSTERNAMEARG.cluster.local" </dev/null
+        ssh -q -o StrictHostKeyChecking=no -o PasswordAuthentication=no $ssh_args $ip "hostnamectl set-hostname $name.pri.$CLUSTERNAMEARG.cluster.local" </dev/null 2>/dev/null
     done <<< "$(echo "$NODES")"
 }
 
