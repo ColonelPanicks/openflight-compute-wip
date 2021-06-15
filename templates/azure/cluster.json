@@ -51,7 +51,8 @@
       }
   },
   "variables": {
-      "subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightcloudclusternetwork', 'flightcloudclusternetwork1')]"
+      "subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightcloudclusternetwork', 'flightcloudclusternetwork1')]",
+      "subnet2Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'flightcloudclusternetwork', 'flightsub2')]"
   },
   "resources": [
     {
@@ -73,7 +74,31 @@
           {
             "name": "flightcloudclusternetwork1",
             "properties": {
-              "addressPrefix": "10.10.0.0/19"
+              "addressPrefix": "10.10.0.0/24"
+            }
+          },
+          {
+            "name": "flightsub2",
+            "properties": {
+              "addressPrefix": "10.10.1.0/24"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/routeTables",
+      "name": "flightsub2rt",
+      "apiVersion": "2017-03-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "routes": [
+          { 
+            "name": "DefaultGatewayViaChead1",
+            "properties": {
+              "addressPrefix": "0.0.0.0/0",
+              "nextHopType": "VirtualAppliance",
+              "nextHopIpAddress": "10.10.0.11"
             }
           }
         ]
@@ -270,7 +295,7 @@
           "properties": {
             "privateIPAllocationMethod": "Dynamic",
             "subnet": {
-              "id": "[variables('subnet1Ref')]"
+              "id": "[variables('subnet2Ref')]"
             }
           }
         }],
