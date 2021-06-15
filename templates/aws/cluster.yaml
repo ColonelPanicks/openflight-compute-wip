@@ -467,7 +467,6 @@ Resources:
 
   cnode01:
     Type: AWS::EC2::Instance
-    DependsOn: chead1
     Properties:
       Tags:
         -
@@ -521,7 +520,6 @@ Resources:
 
   cnode02:
     Type: AWS::EC2::Instance
-    DependsOn: chead1
     Properties:
       Tags:
         -
