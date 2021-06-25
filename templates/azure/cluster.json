@@ -62,7 +62,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
           "project": "[parameters('clustername')]",
-          "core": "true"
+          "type": "core"
       },
       "properties": {
         "addressSpace": {
@@ -111,7 +111,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
           "project": "[parameters('clustername')]",
-          "core": "true"
+          "type": "core"
       },
       "properties": {
         "securityRules": [{
@@ -175,7 +175,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
           "project": "[parameters('clustername')]",
-          "core": "true"
+          "type": "core"
       },
       "properties": {
         "publicIPAllocationMethod": "Static",
@@ -195,7 +195,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
           "project": "[parameters('clustername')]",
-          "core": "true"
+          "type": "core"
       },
       "properties": {
         "ipConfigurations": [{
@@ -226,7 +226,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
           "project": "[parameters('clustername')]",
-          "core": "true"
+          "type": "core"
       },
       "properties": {
         "hardwareProfile": {
@@ -286,7 +286,7 @@
       },
       "tags": {
           "project": "[parameters('clustername')]",
-          "compute": "true",
+          "type": "compute",
           "compute_group": "default"
       },
       "properties": {
@@ -319,7 +319,7 @@
       },
       "tags": {
           "project": "[parameters('clustername')]",
-          "compute": "true",
+          "type": "compute",
           "compute_group": "default"
       },
       "properties": {

@@ -46,8 +46,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "core"
-          Value: "true"
+          Key: "type"
+          Value: "core"
 
   flightigw:
     Type: AWS::EC2::InternetGateway
@@ -58,8 +58,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "core"
-          Value: "true"
+          Key: "type"
+          Value: "core"
 
   flightigwattach:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -77,8 +77,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "core"
-          Value: "true"
+          Key: "type"
+          Value: "core"
 
   flightrt2:
     Type: AWS::EC2::RouteTable
@@ -89,8 +89,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "core"
-          Value: "true"
+          Key: "type"
+          Value: "core"
 
   flightsub1:
     Type: AWS::EC2::Subnet
@@ -105,8 +105,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "core"
-          Value: "true"
+          Key: "type"
+          Value: "core"
 
   flightsub2:
     Type: AWS::EC2::Subnet
@@ -121,8 +121,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "core"
-          Value: "true"
+          Key: "type"
+          Value: "core"
 
   flightsub1rt1assocation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -207,8 +207,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "core"
-          Value: "true"
+          Key: "type"
+          Value: "core"
 
   flightdns:
     Type: AWS::Route53::HostedZone
@@ -227,8 +227,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "core"
-          Value: "true"
+          Key: "type"
+          Value: "core"
 
   dnschead1:
     Type: AWS::Route53::RecordSet
@@ -393,8 +393,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "core"
-          Value: "true"
+          Key: "type"
+          Value: "core"
 
   chead1:
     Type: AWS::EC2::Instance
@@ -410,8 +410,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "core"
-          Value: "true"
+          Key: "type"
+          Value: "core"
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -438,8 +438,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "core"
-          Value: "true"
+          Key: "type"
+          Value: "core"
 
   chead1pubIPassociation:
     Type: AWS::EC2::EIPAssociation
@@ -459,8 +459,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -478,8 +478,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -512,8 +512,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -531,8 +531,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -566,8 +566,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -586,8 +586,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -621,8 +621,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -641,8 +641,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -676,8 +676,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -696,8 +696,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -731,8 +731,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -751,8 +751,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -786,8 +786,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -806,8 +806,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -841,8 +841,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
@@ -861,8 +861,8 @@ Resources:
           Key: "project"
           Value: !Ref clustername
         -
-          Key: "compute"
-          Value: "true"
+          Key: "type"
+          Value: "compute"
         -
           Key: "compute_group"
           Value: "default"
