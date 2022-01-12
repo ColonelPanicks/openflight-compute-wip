@@ -167,7 +167,7 @@ function deploy_azure() {
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
     cat << EOF > /opt/flight/clusters/$CLUSTERNAME
-[gateway]
+[head]
 chead1    ansible_host=$CHEADIP
 
 [nodes]
@@ -220,7 +220,7 @@ function deploy_aws() {
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
     cat << EOF > /opt/flight/clusters/$CLUSTERNAME
-[gateway]
+[head]
 chead1    ansible_host=$CHEADIP
 
 [nodes]
@@ -269,7 +269,7 @@ function run_ansible() {
     # Run ansible playbook
     cd $ANSIBLE_PLAYBOOK_DIR
     export ANSIBLE_HOST_KEY_CHECKING=false
-    ARGS="cluster_name=$CLUSTERNAMEARG munge_key=$( (head /dev/urandom | tr -dc a-z0-9 | head -c 18 ; echo '') | sha512sum | cut -d' ' -f1) compute_nodes=cnode[01-0$COMPUTENODES] $flightenv_dev_var $flightenv_bootstrap_var"
+    ARGS="cluster_name=$CLUSTERNAMEARG compute_ip_range='10.10.0.0/255.255.0.0' shared_ssh_key='$SSH_PUB_KEY' $flightenv_dev_var $flightenv_bootstrap_var"
     echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Ansible | ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars \"$ARGS\" openflight.yml" |tee -a $LOG
     ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "$ARGS" openflight.yml
 }
