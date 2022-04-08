@@ -427,6 +427,7 @@ Resources:
         - DeviceName: /dev/sda1
           Ebs:
             VolumeType: 'gp3'
+            VolumeSize: 32
             DeleteOnTermination: 'true'
 
   chead1pubIP:
