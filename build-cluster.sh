@@ -219,7 +219,29 @@ function deploy_aws() {
     aws cloudformation wait stack-create-complete --stack-name $CLUSTERNAME --region "$AWS_LOCATION"
 
     CHEADIP=$(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id chead1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
-    CHEADFQDN=$(aws ec2 describe-instances --region "$AWS_LOCATION" --instance-ids $(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id chead1 --query 'StackResources[].PhysicalResourceId' --output text) --query 'Reservations[].Instances[].PublicDnsName' --output text)
+
+    cat << EOF > /tmp/$CLUSTERNAME-dns.json
+{
+    "Changes": [
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "chead1.${CLUSTERNAME}.${AWS_DOMAIN}",
+                "Type": "A",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "$CHEADIP"
+                    }
+                ]
+            }
+        }
+    ]
+}
+EOF
+    aws route53 change-resource-record-sets --hosted-zone-id $AWS_DOMAIN_ID --change-batch file:///tmp/$CLUSTERNAME-dns.json
+    rm -f /tmp/$CLUSTERNAME-dns.json
+    CHEADFQDN="chead1.${CLUSTERNAME}.${AWS_DOMAIN}"
 
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
