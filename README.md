@@ -48,7 +48,7 @@ Currently, this is being developed and tested on Azure.
 6. Check/update the application settings
 
    ```
-   vim settings.sh
+   cp settings.sh.example settings.sh
    ```
 
 ## Create a Cluster

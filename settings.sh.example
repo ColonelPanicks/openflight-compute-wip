@@ -7,6 +7,7 @@ AWS_TEMPLATE=templates/aws/cluster.yaml
 
 # FQDN for platforms
 ## See the README for more information on what these are and how to set them up
-AWS_DOMAIN=""
-AZURE_DOMAIN=""
+AWS_DOMAIN="zone1.mydomain.com"
+AWS_DOMAIN_ID=""
+AZURE_DOMAIN="zone2.mydomain.com"
 AZURE_DOMAIN_RG=""
