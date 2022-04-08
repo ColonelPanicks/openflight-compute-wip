@@ -44,6 +44,11 @@ FLIGHTENVDEV=false
 # are installed before users login
 FLIGHTENVPREPARE=false
 
+# If true then the ansible-playbook will install 
+# packages to brand the user and web suite with
+# the Alces moosebird
+ALCESBRANDING=false
+
 #
 # Azure Configuration
 #

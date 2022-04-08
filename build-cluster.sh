@@ -292,10 +292,15 @@ function run_ansible() {
         flightenv_bootstrap_var="flightenv_bootstrap=true"
     fi
 
+    # Determine if Alces branding to be setup
+    if [ "$ALCESBRANDING" = "true" ] ; then
+        flightenv_alces_branding="alces=true"
+    fi
+
     # Run ansible playbook
     cd $ANSIBLE_PLAYBOOK_DIR
     export ANSIBLE_HOST_KEY_CHECKING=false
-    ARGS="cluster_name=$CLUSTERNAMEARG compute_ip_range='10.10.0.0/255.255.0.0' shared_ssh_key='$SSH_PUB_KEY' flightweb_fqdn='$CHEADFQDN' $flightenv_dev_var $flightenv_bootstrap_var"
+    ARGS="cluster_name=$CLUSTERNAMEARG compute_ip_range='10.10.0.0/255.255.0.0' shared_ssh_key='$SSH_PUB_KEY' flightweb_fqdn='$CHEADFQDN' $flightenv_dev_var $flightenv_bootstrap_var $flightenv_alces_branding"
     echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Ansible | ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars \"$ARGS\" openflight.yml" |tee -a $LOG
     ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "$ARGS" openflight.yml
 }
