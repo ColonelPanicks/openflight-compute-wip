@@ -163,6 +163,9 @@ function deploy_azure() {
         customdatanode="$CUSTOMDATANODE" 
 
     CHEADIP=$(az network public-ip show -g $CLUSTERNAME -n chead1pubIP --query "{address: ipAddress}" --output yaml |awk '{print $2}')
+    
+    az network dns record-set a add-record --resource-group $AZURE_DOMAIN_RG --zone-name $AZURE_DOMAIN --record-set-name "chead1.$CLUSTERNAME" --ipv4-address $CHEADIP
+    CHEADFQDN="chead1.$CLUSTERNAME.$AZURE_DOMAIN"
 
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
@@ -216,6 +219,7 @@ function deploy_aws() {
     aws cloudformation wait stack-create-complete --stack-name $CLUSTERNAME --region "$AWS_LOCATION"
 
     CHEADIP=$(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id chead1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")
+    CHEADFQDN=$(aws ec2 describe-instances --region "$AWS_LOCATION" --instance-ids $(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $CLUSTERNAME --logical-resource-id chead1 --query 'StackResources[].PhysicalResourceId' --output text) --query 'Reservations[].Instances[].PublicDnsName' --output text)
 
     # Create ansible hosts file
     mkdir -p /opt/flight/clusters
@@ -269,8 +273,8 @@ function run_ansible() {
     # Run ansible playbook
     cd $ANSIBLE_PLAYBOOK_DIR
     export ANSIBLE_HOST_KEY_CHECKING=false
-    ARGS="cluster_name=$CLUSTERNAMEARG compute_ip_range='10.10.0.0/255.255.0.0' shared_ssh_key='$SSH_PUB_KEY' $flightenv_dev_var $flightenv_bootstrap_var"
-    echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Ansible | ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars \"$ARGS\" openflight.yml" |tee -a $LOG
+    ARGS="cluster_name=$CLUSTERNAMEARG compute_ip_range='10.10.0.0/255.255.0.0' shared_ssh_key='$SSH_PUB_KEY' flightweb_fqdn='$CHEADFQDN' $flightenv_dev_var $flightenv_bootstrap_var"
+    echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | Start Ansible | ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars \"$ARGS\" openflight.yml" |tee -a $LOG
     ansible-playbook -i /opt/flight/clusters/$CLUSTERNAME --extra-vars "$ARGS" openflight.yml
 }
 
@@ -311,4 +315,4 @@ case $PLATFORM in
 esac
 
 
-echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | End Deploy | chead1 IP: $CHEADIP" |tee -a $LOG
+echo "$(date +'%Y-%m-%d %H-%M-%S') | $CLUSTERNAME | End Deploy | chead1 IP: $CHEADFQDN ($CHEADIP)" |tee -a $LOG

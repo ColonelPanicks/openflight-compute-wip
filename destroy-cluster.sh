@@ -7,6 +7,9 @@
 # Get directory of script for locating templates and config
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+# Source application variables
+source $DIR/settings.sh
+
 # Source variables
 if [ -z "${CONFIG}" ] ; then
     source $DIR/configs/default.sh
@@ -60,6 +63,7 @@ function check_cluster_azure {
 function destroy_cluster_azure {
     cluster=$1
     az group delete -y --name $cluster
+    az network dns record-set a delete --resource-group $AZURE_DOMAIN_RG --zone-name $AZURE_DOMAIN --name "chead1.$cluster" -y
 }
 
 function check_cluster_aws {
