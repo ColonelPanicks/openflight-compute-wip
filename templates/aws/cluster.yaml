@@ -500,6 +500,7 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
+            VolumeSize: 12
 
   cnode02network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -553,6 +554,7 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
+            VolumeSize: 12
 
   cnode03network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -608,6 +610,7 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
+            VolumeSize: 12
 
   cnode04network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -663,6 +666,7 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
+            VolumeSize: 12
 
   cnode05network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -718,6 +722,7 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
+            VolumeSize: 12
 
   cnode06network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -773,6 +778,7 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
+            VolumeSize: 12
 
   cnode07network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -828,6 +834,7 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
+            VolumeSize: 12
 
   cnode08network1interface:
     Type: AWS::EC2::NetworkInterface
@@ -883,4 +890,5 @@ Resources:
           Ebs:
             VolumeType: 'gp3'
             DeleteOnTermination: 'true'
+            VolumeSize: 12
 
