@@ -2,6 +2,22 @@
 
 This repository contains scripts for the R&D setup of OpenFlight Compute.
 
+## Cloud DNS Preparation
+
+To support FQDNs for a custom domain on Azure & AWS a little bit of preparation is needed. The instructions below explain how to point a subdomain hosted externally to both platforms at the two platforms in order to allow for custom FQDNS.
+
+The subdomains need to be set for both the `AWS_DOMAIN` and `AZURE_DOMAIN` application-wide settings in `settings.sh`. Additionally the `AWS_DOMAIN_ID` needs to be set to the ID of the Route53 zone and the `AZURE_DOMAIN_RG` needs to be set to the resource group where the DNS Zone exists. (_Note: these settings can be overridden on a per-config basis_)
+
+### AWS
+
+- Create public hosted zone in Route53 for the subdomain (e.g. `zone1.clusters.openflighthpc.org`)
+- Create an NS record for the subdomain in the external DNS provider pointing to the Route53 nameservers 
+
+### Azure
+
+- Create public hosted zone in DNS Zones for the subdomain (e.g. `zone2.clusters.openflighthpc.org`)
+- Create an NS record for the subdomain in the external DNS provider pointing to the Azure DNS Zone nameservers
+
 ## Configure Environment
 
 Currently, this is being developed and tested on Azure.
@@ -32,7 +48,7 @@ Currently, this is being developed and tested on Azure.
 6. Check/update the application settings
 
    ```
-   vim settings.sh
+   cp settings.sh.example settings.sh
    ```
 
 ## Create a Cluster

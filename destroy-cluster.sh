@@ -7,6 +7,9 @@
 # Get directory of script for locating templates and config
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+# Source application variables
+source $DIR/settings.sh
+
 # Source variables
 if [ -z "${CONFIG}" ] ; then
     source $DIR/configs/default.sh
@@ -60,6 +63,7 @@ function check_cluster_azure {
 function destroy_cluster_azure {
     cluster=$1
     az group delete -y --name $cluster
+    az network dns record-set a delete --resource-group $AZURE_DOMAIN_RG --zone-name $AZURE_DOMAIN --name "chead1.$cluster" -y
 }
 
 function check_cluster_aws {
@@ -72,6 +76,27 @@ function check_cluster_aws {
 function destroy_cluster_aws {
     cluster=$1
     aws cloudformation delete-stack --stack-name $cluster --region $AWS_LOCATION
+    cat << EOF > /tmp/$cluster-dns-remove.json
+{
+    "Changes": [
+        {
+            "Action": "DELETE",
+            "ResourceRecordSet": {
+                "Name": "chead1.${cluster}.${AWS_DOMAIN}",
+                "Type": "A",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "$(aws cloudformation describe-stack-resources --region "$AWS_LOCATION" --stack-name $cluster --logical-resource-id chead1pubIP |grep PhysicalResourceId |awk '{print $2}' |tr -d , | tr -d \")"
+                    }
+                ]
+            }
+        }
+    ]
+}
+EOF
+    aws route53 change-resource-record-sets --hosted-zone-id $AWS_DOMAIN_ID --change-batch file:///tmp/$cluster-dns-remove.json
+    rm -f /tmp/$cluster-dns-remove.json
 }
 
 function cluster_error {
